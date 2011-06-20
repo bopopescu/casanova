@@ -1,4 +1,5 @@
 # Django settings for TextAnalysis project.
+from os.path import join, dirname, abspath, exists
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -16,6 +17,7 @@ DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
 DATABASE_PORT = ''
 
+LOCAL_FILE = lambda *x: abspath(join(dirname(__file__), *x))
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -42,7 +44,8 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = LOCAL_FILE('media')
+
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -80,6 +83,8 @@ WEBSITE_DIR = os.path.dirname(__file__)
 PROJECT_ROOT = os.path.abspath(WEBSITE_DIR)
 TEMPLATE_DIRS = (
     '%s/globocore/materia/templates' % PROJECT_ROOT,
+    '%s/textClassification/templates' % PROJECT_ROOT,
+    
 )
 
 INSTALLED_APPS = (
@@ -95,4 +100,14 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable the admin:
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+)
+
+EXCLUDE_TEST_APPS = (
+'django.contrib.auth',
+'django.contrib.contenttypes',
+'django.contrib.sessions',
+'django.contrib.sites',
+'django.contrib.messages',
+'django.contrib.admin',
+'testutils',
 )
