@@ -1,0 +1,98 @@
+# Create your views here.
+from django.http import HttpResponse
+from django.template import Template, Context
+from django.template.loader import get_template
+from django.shortcuts import render_to_response
+import datetime
+from estrutura.models import Site, Elemento, Instancia
+
+def site(request, site):
+    now = datetime.datetime.now()
+    
+    try:
+        f = Site.objects.get(nome=site)
+    except:
+        raise Site.DoesNotExist('Este site <<%s>> nao esta cadastrado' % site)
+
+    # to render a template you can do this way
+
+    template = f.template.__unicode__().split('/')[-1]
+    t = get_template(template)
+    c = Context({"time":now,"site": site})
+        
+
+    from django.conf import settings
+    j = 0
+    for counter,node in enumerate(t.nodelist):
+        for app in settings.INSTALLED_APPS:
+            modulo = app.split('.')[-1]
+            elemento = '<Variable Node: %s>' % modulo
+            if node.__str__() == elemento:
+                try:
+                    e = Elemento.objects.get(nome=modulo)
+                    j += 1
+                except:
+                    raise Elemento.DoesNotExist('O elemento <<%s>> nao esta cadastrado para o site <<%s>>' %  (modulo, site))
+
+                try:
+                    i = Instancia.objects.filter(elemento=e,ordem=j)
+                    i = i[0]
+                    import pdb; pdb.set_trace()
+                    url = i.instancia.__str__() + "/" + i.elemento.id.__str__() + ".js"
+                except:
+                    raise Instancia.DoesNotExist('O elemento <<%s>> nao tem uma instancia cadastrada para a posicao<<%s>> no site <<%s>>' %  (modulo, j, site))
+
+                import httplib, simplejson
+                conn = httplib.HTTPConnection("localhost" , "8001")
+                h = {"Content-type": "application/json","Accept": "text/plain"}
+                
+                conn.request("GET", url, headers=h)
+                response = conn.getresponse()
+                c = Context({"boxtexto":eval(response.read()),})
+                conn.close()
+
+                # pega a template do elemento
+                template = e.template.__unicode__().split('/')[-1]
+                html = get_template(template)
+                t.nodelist[counter] = html.render(c)
+    
+    c = Context({"time":now,"site": site})
+    html = t.render(c)
+
+    return HttpResponse(html)
+    
+    # or this way with shortcut render_to_response
+    #return render_to_response('current_time.html',{"time":now})
+    
+def edit(request, site):
+    now = datetime.datetime.now()
+    
+    try:
+        f = Site.objects.get(nome=site)
+    except:
+        raise Site.DoesNotExist('Este site <<%s>> nao esta cadastrado' % site)
+
+    # to render a template you can do this way
+
+    template = f.template.__unicode__().split('/')[-1]
+    t = get_template(template)
+
+
+    from django.conf import settings
+    for counter,node in enumerate(t.nodelist):
+        for app in settings.INSTALLED_APPS:
+            modulo = app.split('.')[-1]
+            elemento = '<Variable Node: %s>' % modulo
+            if node.__str__() == elemento:
+                valor = '<input type=button value=%s />' % modulo
+                t.nodelist[counter] = valor
+
+
+    c = Context({"time":now,"site": site})
+    
+    html = t.render(c)
+
+    return HttpResponse(html)
+    
+    # or this way with shortcut render_to_response
+    #return render_to_response('current_time.html',{"time":no

@@ -1,0 +1,9 @@
+<link type="text/css" href="/portal/media/css/menu.css" rel="stylesheet" media="screen" />
+<div id="menu">
+<ul >
+	<h2>editorias</h2>
+	{% for item in menu %}
+   		<li><a href="{{item.link}}">{{item.nome}}</a></li>
+	{% endfor %}
+</ul>
+</div>

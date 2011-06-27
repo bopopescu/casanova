@@ -1,0 +1,11 @@
+<link type="text/css" href="/portal/media/css/boxtexto.css" rel="stylesheet" media="screen" />
+
+<div id="boxtexto">
+	<span class="titulo"><a href="{{boxtexto.link}}">{{boxtexto.title}}</a></span>
+	<span class="subtitulo"><a href="{{boxtexto.link}}">{{ boxtexto.texto }}</a></span>
+	{% if boxtexto.link2 and boxtexto.leiamais %}
+		<ul class="secundaria"><li><a class="link" href="{{boxtexto.link2}}">{{boxtexto.leiamais}}</a></li><ul>
+	{% endif %}
+</div>
+
+

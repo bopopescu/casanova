@@ -1,0 +1,14 @@
+<html>
+<head><script src="media/jquery-1.3.2.js"></script></head>
+<script language="javascript">
+$.getJSON(url,
+function(data){
+  $.each(data.items, function(i,item){
+	console.log(item.title)
+  });
+});
+</script>
+<body>
+<h1>Este é o template do {{site}} <br> {{boxtexto}}</h1>
+</body>
+</html>

@@ -1,0 +1,46 @@
+#boxdestaquewide {
+    border-bottom: 1px solid #ddd;
+    float: left;
+	height: 160px;
+	width:540px;
+	padding-top: 10px;
+	margin-right: 10px;
+
+}
+
+#boxdestaquewide .titulo {
+	font-size:2.5em;
+	display:block;
+	letter-spacing:-0.05em;
+	line-height:1em;
+	padding-bottom:0.3em;
+}
+
+#boxdestaquewide .subtitulo {
+    color: #686868;
+    line-height: 1.2em;
+    padding-bottom:0.9em;
+    display:block;
+}
+
+#boxdestaquewide .foto.esquerda { 
+    float: left;
+    margin: 0 1.5em 0.833em 0;
+}
+
+
+#boxdestaquewide a {
+	color:#006129;
+}
+
+#boxdestaquewide a:hover { 
+    text-decoration: underline;
+    color:#006129;
+}
+
+#boxdestaquewide .secundaria li {
+    list-style: disc;
+    list-style-position: inside;
+}
+
+

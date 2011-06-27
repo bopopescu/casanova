@@ -1,0 +1,9 @@
+from django.db import models
+
+class BoxTexto(models.Model):
+    title = models.CharField(u'title', max_length=100)
+    texto = models.CharField(u'texto', max_length=400)
+    link = models.URLField(u'link', max_length=255)
+
+    def __unicode__(self):
+        return u'%s' % (self.title)

@@ -1,0 +1,11 @@
+from piston.handler import BaseHandler
+from boxtexto.models import BoxTexto
+from django.http import Http404 
+
+class BoxTextoHandler(BaseHandler):
+   allowed_methods = ('GET',)
+   model = BoxTexto
+   
+   def read(self, request, boxtexto_id):
+   	b = BoxTexto.objects.get(id=boxtexto_id)
+	return b 

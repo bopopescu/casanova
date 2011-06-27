@@ -1,0 +1,31 @@
+{% load estrutura_general %}
+<script>
+
+	function Classify() {
+
+		corpo = "" //$("#cke_contents_id_corpo").val()
+		titulo = "" //$("#id_titulo").val()
+		subtitulo = "" //$("#id_subtitulo").val()
+	   bodyContent = $.ajax({
+	         url: "/admin/textAnalysis/materia/classify/",
+	         global: false,
+	         type: "POST",
+	         data: ({texto : corpo, titulo : titulo, subtitulo : subtitulo,}),
+	         dataType: "html",
+	         async:false,
+	         success: function(msg){
+	            // $("#id_tags").val(msg);
+					alert('oi');
+	         }
+	      }
+	   ).responseText;
+
+	}
+
+
+	$(document).ready(function() {
+		$('a[title="Saiba Mais"]').click(function() {
+			Classify();
+		});
+	});
+</script>

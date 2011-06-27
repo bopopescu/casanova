@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>Google AJAX Search API Sample</title>
+    <script src="http://www.google.com.br/jsapi"></script>
+    <script type="text/javascript">
+	google.load('search', '1');
+	var WebSearch;
+	function searchComplete() {
+	  if (WebSearch.results && WebSearch.results.length > 0) {
+	    var contentDiv = document.getElementById('content');
+	    contentDiv.innerHTML = '';
+	    var results = WebSearch.results;
+	    for (var i = 0; i < results.length; i++) {
+	      var result = results[i];
+	      var textContainer = document.createElement('div');
+
+		  // var item = document.createElement('div')
+		  // textContainer.appendChild(item)
+		  // item.innerHTML = i+1;
+		  // 
+		  // 
+		  // 	      var newA = document.createElement('a');
+		  // 	      newA.href = result.url;
+		  // newA.innerHTML = result.titleNoFormatting;
+		  // 	      textContainer.appendChild(newA);
+		  // 	
+		  // var content = document.createElement('div');
+		  // content.innerHTML = result.content;
+		  // textContainer.appendChild(content);
+		  
+		  var uri = document.createElement('span');
+		  uri.innerHTML = result.unescapedUrl;
+		  textContainer.appendChild(uri);
+
+		  var br = document.createElement('br');
+	
+	      contentDiv.appendChild(textContainer);
+		  //contentDiv.appendChild(br);	
+	    }
+	  }
+	}
+
+	function OnLoad() {
+	  WebSearch = new google.search.WebSearch();
+	  WebSearch.setSearchCompleteCallback(this, searchComplete, null);	
+	  WebSearch.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+	  WebSearch.execute("romário site:rsssf.com");
+	}
+	google.setOnLoadCallback(OnLoad);
+    </script>
+  </head>
+  <body style="font-family: Arial;border: 0 none;">
+    <div id="content">Loading...</div>
+  </body>
+</html>

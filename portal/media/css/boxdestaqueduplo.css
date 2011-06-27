@@ -1,0 +1,84 @@
+#boxtexto {
+    border-bottom: 1px solid #ddd;
+    float: left;
+	height: 180px;
+	width:260px;
+	margin: 0px 10px 10px 0px;
+
+}
+
+#boxtexto .chapeu  {
+    font-size: 0.833em;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 8px;
+	line-height: 1em;
+}
+
+#boxtexto .titulo {
+	font-size:2.5em;
+	display:block;
+	letter-spacing:-0.05em;
+	line-height:1em;
+	padding-bottom:0.3em;
+}
+
+#boxtexto .subtitulo {
+    color: #686868;
+    line-height: 1.2em;
+    padding-bottom:0.9em;
+    display:block;
+}
+
+
+#boxtexto a {
+	color:#006129;
+}
+
+#boxtexto a:hover { 
+    text-decoration: underline;
+    color:#006129;
+}
+
+#boxtexto .foto.esquerda { 
+    float: left;
+    margin: 0 1.5em 0.833em 0;
+}
+
+#boxtexto .foto.direita { 
+    float: right;
+    margin: 0 0 0.833em 0.833em;
+}
+
+#boxtexto .secundaria li {
+    list-style: disc;
+    list-style-position: inside;
+}
+
+#boxtexto .relacionada li .titulo {
+    display: block;
+    font-size: 1.166em;
+    font-weight: bold;
+    letter-spacing: -0.05em;
+    padding-bottom:0.9em;
+}
+
+#boxtexto .relacionada li {
+    color: #5C6BAC;
+    list-style: disc;
+    list-style-position: inside;
+    font-size: 0.83em;
+}
+
+#boxtexto .relacionada li a {
+    font-size: 1.2em;
+    margin-left:-0.5em;
+}
+
+#boxtexto .relacionada a { 
+    font-weight: bold;
+    line-height: 1.2em;
+}
+
+

@@ -1,0 +1,48 @@
+#boxfoto {
+    border-bottom: 1px solid #ddd;
+    float: left;
+	height: 110px;
+	width:260px;
+	padding-top: 10px;
+	margin-right: 10px;
+
+
+}
+
+#boxfoto .chapeu  {
+    font-size: 0.833em;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 8px;
+	line-height: 1em;
+}
+
+#boxfoto .titulo {
+	font-size:1.6em;
+	display:block;
+	letter-spacing:-0.04em;
+	line-height:1em;
+	padding-bottom:0.3em;
+}
+
+#boxfoto a {
+	color:#006129;
+}
+
+#boxfoto a:hover { 
+    text-decoration: underline;
+    color:#006129;
+}
+
+#boxfoto .foto.esquerda { 
+    float: left;
+    margin: 0 1.5em 0.833em 0;
+}
+
+#boxfoto .foto.direita { 
+    float: right;
+    margin: 0 0 0.833em 0.833em;
+}
+
+

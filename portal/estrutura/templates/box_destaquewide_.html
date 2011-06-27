@@ -1,0 +1,19 @@
+<link type="text/css" href="/portal/media/css/boxdestaquewide.css" rel="stylesheet" media="screen" />
+
+<div id="boxdestaquewide">
+	{% if boxdestaquewide.foto%}
+	<img class="foto esquerda" src="/portal/{{boxdestaquewide.foto}}" />
+	{% endif %}
+	<span class="titulo"><a href="{{boxdestaquewide.link}}">{{boxdestaquewide.title}}</a></span>
+	<span class="subtitulo"><a href="{{boxdestaquewide.link}}">{{ boxdestaquewide.texto }}</a></span>
+		<ul class="secundaria">
+			{% if boxdestaquewide.linkleiamais and boxdestaquewide.leiamais %}
+			<li><a class="link" href="{{boxdestaquewide.linkleiamais}}">{{boxdestaquewide.leiamais}}</a></li>
+			{% endif %}			
+			{% if boxdestaquewide.linkleiamais2 and boxdestaquewide.leiamais2 %}
+			<li><a class="link" href="{{boxdestaquewide.linkleiamais2}}">{{boxdestaquewide.leiamais2}}</a></li>
+			{% endif %}
+		<ul>
+</div>
+
+

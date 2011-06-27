@@ -1,0 +1,953 @@
+/* ---- grid ---- */
+#glb-doc, #glb-barra, #glb-rodape {width:100%;}
+#glb-barra, #glb-rodape {background:#ccc;display:table;min-width:960px;}
+#glb-barra .conteudo-barra, #glb-rodape .conteudo-rodape {margin:0 auto;width:80em;}
+#glb-corpo {margin:0 auto;overflow:auto;min-width:960px;width:80.3em;}
+
+/* ---- clear ---- */
+.glb-bloco {overflow:auto;width:100%;}
+
+/* ---- units ---- */
+.glb-grid-1, .glb-grid-2, .glb-grid-3, .glb-grid-4, .glb-grid-5, .glb-grid-6, .glb-grid-7, .glb-grid-8, .glb-grid-9, .glb-grid-10, .glb-grid-11, .glb-grid-12 {display:inline;float:left;margin:0 .833em;}
+.glb-grid-1 {min-width:60px;width:5em;}
+.glb-grid-2 {min-width:140px;width:11.665em;}
+.glb-grid-3 {min-width:220px;width:18.333em;}
+.glb-grid-4 {min-width:300px;width:25em;}
+.glb-grid-5 {min-width:380px;width:31.665em;}
+.glb-grid-6 {min-width:460px;width:38.333em;}
+.glb-grid-7 {min-width:540px;width:45em;}
+.glb-grid-8 {min-width:620px;width:51.665em;}
+.glb-grid-9 {min-width:700px;width:58.333em;}
+.glb-grid-10 {min-width:780px;width:65em;}
+.glb-grid-11 {min-width:860px;width:71.665em;}
+.glb-grid-12 {min-width:940px;width:78.333em;}
+
+/* ---- interface ---- */
+#glb-corpo {background:#fff;}
+/*p {border:1px solid #666;padding:.833em 0;text-align:center;margin:.833em 0;} */
+
+.invisivel {
+    display: none;
+}
+
+.vertical {
+    width: 1px;
+    height: 52px;
+    background-color: #ddd;
+    margin: 3px 15px 0px 15px;
+    float: left;
+}
+
+.mt20 {
+    margin-top: 20px;
+}
+
+.mt15 {
+    margin-top: 15px;
+}
+
+#barra {
+    height: 30px;
+    background-color: #ddd;
+}
+
+/* ######################### rodape ########################### */
+
+.espacadorrodape {
+    height:30px;
+}
+
+#rodape {
+    font-family: Arial;
+    font-size: 1em;     
+    font-style: bold;     
+    color: #7b7b7b;
+    float: left;
+    margin: 20px 0px 20px 0px;    
+    letter-spacing: -0.02em;    
+}
+
+#rodape-menu ul {
+	margin-left: 0;
+	padding-left: 0;
+	display: inline;
+	float: right;
+	margin-top: 10px;
+	} 
+
+#rodape-menu ul li {
+	margin-left: 0;
+	margin-top: 10px;
+	margin-bottom: 8px;
+	padding: 0px 6px;
+	border-left: 1px solid #bbb; 
+	list-style: none;
+	display: inline;
+	float: left;
+	}
+
+#rodape-menu ul li.first {
+	margin-left: 0;
+	border-left: none;
+	list-style: none;
+	display: inline;
+	float: left;
+	padding-left: 0px;
+	}
+
+#rodape-menu a {
+    color: #7b7b7b;
+}
+
+#rodape a {
+    color: gray;
+}
+
+
+.separator2 {
+    color: #000000;
+}
+
+
+#glb-barra, #glb-rodape {background:#ddd}
+
+
+
+
+#titulo {
+    float: left;
+}
+
+.logoanuncie {
+    margin-top: 10px;
+}
+
+#header h1 {
+    font-family: "Vag rounded";
+    font-size: 3em;    
+    margin: 8px 0px 13px 12px;
+    float: left;
+}
+
+#menu {
+/*    margin-top: -13px;*/
+    font-family: Arial;
+    font-size: .91em;     
+    color: #595959;
+    display: block;
+	height: 2.5em;
+	width: 100%;
+	zoom: 1;
+
+}
+
+#menu ul {
+	margin-left: 0;
+	padding-left: 0;
+	display: block;
+    
+	} 
+
+#menu ul li {
+	margin-left: 0;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	padding: 0px 6px;
+	border-left: 1px solid #eee; 
+	list-style: none;
+	display: inline;
+	float: left;
+		zoom: 1;
+	}
+
+#menu ul li.first {
+	margin-left: 0;
+	border-left: none;
+	list-style: none;
+	display: inline;
+	float: left;
+	padding-left: 0px;
+		zoom: 1;
+	}
+	
+#menu a {
+    color: #595959;
+}
+
+.separador-menu {
+   height:3px;background-color: #ddd;border: 1px solid #ddd;-webkit-border-radius: 3px;-moz-border-radius: 3px;
+}
+
+.separator {
+    color: #eee;
+}
+
+#linha {
+    width: 100%;
+    
+}
+
+.azul {
+    background-image: url(/po/an/m/mediakit/img/barra_header.gif);
+}
+
+.separador_grosso {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 10px 10px 20px 10px;
+    height: 3px;
+}
+
+
+/* ####### MIOLO ########### */
+
+
+#box_titulo{
+	width:700px;
+	margin-top: 30px;
+	margin-bottom: 10px;
+	height: 35px;
+	border-bottom: 1px solid #dddddd;
+}
+
+
+
+
+.titulo_pagina {
+	font-family: Arial;
+	color: #363636;
+	font-weight: bold;
+	font-size: 1.8em;
+	letter-spacing: -0.05em;
+	padding-bottom: 10px;
+	float: left;
+	display: block;
+}
+
+.fonte_ibope{
+	font-family: Arial;
+	font-size: 1em;
+	color: gray;
+	float: right;
+	display: block;
+}
+
+.fonte {
+    padding-top: 5px;
+    padding-right: 10px;
+    float:right;
+    color: #c9c9c9;
+}
+
+.txt_venda p {
+	font-family: Georgia;
+	font-style: italic;
+	font-size: 1.3em;
+	color: #363636;
+    z-index: 40;
+    width: 290px;
+}
+.txt_venda_d {
+    width:300px;
+    z-index: 40;
+    float: left;
+}
+
+.txt_quote {
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 6em;
+	color: #dddddd;
+	float: right;
+	margin-top: -50px;
+	z-index: 30;
+	}
+
+
+.txt_venda {
+	width: 330px;
+	height: 50px;
+    float: left;
+}
+
+
+.txt_metrica {
+	font-size: 1.8em;
+}
+
+.txt_audiencia{
+	font-family: Arial;
+	font-size: 1.2em;
+	letter-spacing: -0.05em;
+	color: #363636;
+	float:left;
+	width: 130px;
+	padding-left: 20px;
+}
+
+
+.separador {
+    border-right: 1px solid #dddddd;	
+    width: 1px;
+    height: 50px;
+	float:left;
+	padding-left: 10px;
+	padding-right: 10px;	
+		
+}
+
+.tx_cinza {
+    color: #363636;
+}
+
+
+/* ####### bordas redondas ########### */
+
+
+/* .rounded_box {position:relative;padding-left:3px; margin:0;height: 3px;} */
+
+.rounded_box {position:relative; margin:0;height: 3px;}
+.corner {position:absolute; width:3px; height:3px;background-image:url(/po/an/m/mediakit/img/top_rounded.gif)}
+.top {width:216px;height:3px;top:0; left:3px;background: white url(/po/an/m/mediakit/img/top_flat.gif) top left repeat-x}
+.top_left {top:0; left:0; background-position:-1px 0px;}
+.top_right {top:0; right:0; background-position:-2px 0px;}
+
+
+
+
+/* ####################### NOSSOS CANAIS ###################### */
+
+.top_content {width:697px;height:3px;top:0; left:3px;background: white url(/po/an/m/mediakit/img/top_flat.gif) top left repeat-x}
+
+/*
+usado em:
+    - formatos na pagina de canal
+*/
+.contentbar {
+    margin-top: 35px;  
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ddd;
+    
+    font-family: Arial;
+    float: left;  
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+
+.contentbar-breadcrumb {
+    margin-top: 5px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ddd;
+    
+    font-family: Arial;
+    float: left;  
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+
+.breadcrumb {
+    margin-top: 35px;  
+
+    font-family: Arial;
+    float: left;  
+
+}
+
+/*
+usado em:
+    - formatos na pagina de canal
+*/
+.contentbar .title {
+	border-bottom: 1px solid #dddddd;
+	padding: 10px 9px;
+}
+
+/*
+usado em:
+    - principal na pagina de canal
+*/
+.contentbar .section {
+	border-bottom: 1px solid #dddddd;
+	padding-bottom: 10px;
+	margin: 10px;
+}
+
+/*
+usado em:
+    - pagina canal, header pagina
+*/
+.contentbar .header {
+    padding: 20px 10px;
+}
+
+
+/*
+usado em:
+    - formatos na pagina de canal
+*/
+.contentbar h2 {
+    color: #363636;
+    font-weight: bold;
+    font-size: 1.6em;
+    letter-spacing: -0.05em;
+}
+
+.contentbar_formato {
+	background-color:#EEEEEE;
+	border-bottom:1px solid #DDDDDD;
+	float:left;
+/*  width:698px;*/
+}
+
+.contentbar .menuformatos {
+	width: 160px;
+	font-size: 1.1em;
+	color: #0166dd;
+	font-weight: bold;
+	letter-spacing: -0.01em;
+	padding-top: 15px;
+    float: left;
+    background-color: #eeeeee;
+}
+
+.contentbar .esquerdo {
+    float:left;
+    width:160px;
+    background-color: #eeeeee;
+    
+}
+
+.contentbar .direito {
+    float:left;
+    width:450px;
+}
+
+.contentbar .menuformatos ul {
+    margin-left: 0px;
+
+}
+
+.contentbar .menuformatos li {
+    padding: 0px 0px 0px 0px;
+
+
+}
+ 
+.contentbar .menuformatos .link_formato {
+    color: #0166dd;
+    padding: 10px 15px 11px 14px;
+    border-left: 3px solid #eeeeee;
+}
+
+.contentbar .tab-current {
+    background-color: #ffffff;
+    padding: 10px 15px 9px 15px !important;
+    border-left: 3px solid #0166dd !important;
+    border-top: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    position: relative; top: -1px; left: -1px;
+    width: 128px;
+    color: #363636 !important; 
+
+}
+
+.contentbar .espacador {
+    background-color: #dddddd;
+    height:1px;
+    margin: 0px 18px;
+}
+
+.contentbar .espacadorapagado {
+    background-color: #eeeeee !important;
+    height:1px;
+    margin: 0px 18px;
+}
+
+.contentbar .topo_formato{
+    float: left;
+	height: 38px;
+	border-bottom: 1px solid #ddd; 
+	width: 420px;
+	padding-bottom: 20px;
+}
+
+.contentbar .botoes_formato{
+    float: left;
+	height: 38px;
+	border-bottom: 0px solid #ddd; 
+	width: 420px;
+	padding-bottom: 15px;
+}
+
+/* usado em:
+    - pagina de canal widget formatos
+*/
+.contentbar .caracteristicas {
+/*    float: left;*/
+    width: 100%;
+    padding-top: 13px;
+}
+
+/* usado em:
+    - pagina de canal widget formatos
+*/
+.contentbar .infos_especificas {
+	margin-bottom: 15px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #ddd;
+	width: 100%;
+}
+
+/* usado em:
+    - ultimo item de caracteristicas de formatos na pagina de canal
+*/
+.contentbar .caracteristicas .last {
+    border-bottom: 0px solid black !important;
+}
+
+
+.espec_formato_nome{
+	font-size: 1.3em;
+	color: #363636;
+	letter-spacing: -0.01em;
+	font-weight: bold;
+	padding-bottom: 5px;
+}
+
+.espec_formato_valor{
+	font-size: 1em;
+	color: #363636;
+	letter-spacing: -0.01em;
+}
+
+.itens_topo_formato {
+	float: left;
+	padding-right: 55px;
+}
+
+.imagem{
+	float: left;
+	width: 220px;
+}
+
+
+.tabbed div.t2, .tabbed div.t3, .tabbed div.t4 {
+	display: none;
+}
+
+.divtab {
+    float:left;	
+    display: block;
+    width: 417px;
+    padding: 20px 20px;
+}
+
+.tab a, .tab a:visited{
+    display: block;
+    padding: 10px 15px 10px 15px;
+}
+
+.formatothumb {
+    display: block;
+}
+
+
+.lista_canais {
+    width: 690px;
+    font-family: Arial;
+    border-bottom: 1px solid #dddddd;
+    margin-top: 0px;
+    float: left;    
+}
+
+
+.menu { 
+    background-color: #f7f7f7;
+}
+
+.menu li, .menu lh {
+    float: left;
+    color: #505d9c;
+    margin: 5px 6px 10px 6px;
+}
+
+.menu_highlight {
+    border: 1px solid #505d9c !important;
+    
+    -webkit-border-radius: 3px;
+}
+
+#contentbar ul {
+    color: #363636;
+    margin: 20px 12px 20px 12px;
+}
+
+#contentbar lh {
+    font-weight: bold;
+    font-size: 1.2em;
+    display: block;
+    padding-bottom: 6px;
+}
+
+.contentbar .rodape {
+    border-bottom: 0px solid #dddddd;
+}
+
+#spacer {
+    background-color: white;
+    height: 3em;
+    padding: 0.8em 0px 0.8em 0px;
+}
+
+/* ###################### Content Canal ###################### */
+
+.canal {
+    float: left;
+}
+
+.canal_logo {
+    padding: 14px;
+}
+.canal_nome {
+    width: 410px;
+}
+
+.canal_nome h2 {
+    font-family: Arial;
+    font-size: 1.3em;
+    letter-spacing: -0.05em;
+    color: #505d9c;
+    padding-top: 20px;
+}
+
+.canal_estatistica {
+    width: 120px;
+}
+.lista_canais .vertical {
+    height: 100% !important;
+}
+.canal_estatistica h2 {
+    font-family: Arial;
+    font-size: 1.2em;
+    letter-spacing: -0.01em;
+    color: #363636;
+    padding-top: 20px;  
+    font-weight: normal;  
+}
+
+.canal_estatistica p {
+    font-family: Arial;
+    font-size: 1.8em;
+    letter-spacing: -0.05em;
+    color: #363636;
+    padding-top: 2px;  
+    font-weight: bold;  
+}
+
+.canal_descricao {
+    width: 410px;
+    font-family: Georgia;
+    font-size: 1.2em;
+    color: #363636;
+    padding-top: 5px; 
+    padding-bottom: 20px; 
+    font-weight: light;
+    font-style: italic;  
+}
+
+.canal_nome div {
+        /*width: 160px;*/
+}
+.canal_nome ul {
+	margin-left: 0;
+	padding-left: 0;
+	display: inline;
+	} 
+
+.canal_nome ul li {
+	margin-left: 0;
+	padding: 3px 2px;
+	list-style: none;
+	display: inline;
+	float: left;
+	}
+.canal_nome ul li:after {
+    content: ", ";
+}
+.canal_nome ul li.last:after {
+    content: ". ";
+}
+	
+		
+.canal_nome ul li.first {
+	margin-left: 0;
+	border-left: none;
+	list-style: none;
+	display: inline;
+	float: left;
+	}
+
+.contentbar .header .logo {
+    float: left;
+}
+
+
+
+.menu_item_link_marcado {
+     color : #363636 !important;
+	 width: 135px;
+
+}
+
+.menu_item_link_desmarcado {
+    display: block;
+    width: 135px;
+    color:#505D9C;
+    
+}
+
+.menu_item_marcado {
+    background-color : white; 
+    width: 131px;
+    border-left: 3px solid #505D9C;
+    padding-left: 12px !important;
+
+}
+
+.menu_item_desmarcado {
+    background-color : #eee; 
+    width: 130px;
+
+}
+
+
+
+
+.item_idade{
+	font-family: Arial;	
+    padding: 10px;
+    margin-right: 10px;
+    float: left;
+}
+
+
+.item_sexo{
+	font-family: Arial;	
+    padding: 10px;
+    margin-right: 10px;
+    float: left;
+}
+
+
+
+.header_content {
+    color: #363636;
+    font-weight: bold;
+    font-size: 1.6em;
+    letter-spacing: -0.05em; 
+    padding: 10px;
+    border-bottom: 1px solid #DDD;
+ /* margin-left: -3px; */
+}
+
+
+
+.valor {
+    font-family: Arial;
+    font-size: 2.3em;
+    letter-spacing: -0.08em;
+    color: #363636;
+	}
+	
+.metrica_idade{
+	font-family: Arial;
+    font-size: 1em;
+    color: #363636;
+    padding-left: 10px;
+}	
+
+
+.metrica_sexo{
+	font-family: Arial;
+    font-size: 1em;
+    color: #363636;
+    padding-left: 10px;
+}
+
+.infos_idade{
+	width: 60%;
+	float: left;
+	margin: 10px 10px 0 0;
+	border-right: 1px solid #eee;	
+}
+
+.infos_sexo{
+	float: left;
+	margin: 10px 0px;
+}
+
+.half {
+    width: 48%;
+}
+
+
+/* ###################### Content contatos empresa ###################### */
+
+.contato_titulo{
+    width:100%;	
+   	font-family: Arial;
+	color: #363636;
+	font-weight: bold;
+	font-size: 2.4em;
+	letter-spacing: -0.05em;
+	margin-top: 40px;
+	}
+
+.contato_subtitulo{
+   	font-family: Arial;
+	color: #363636;
+	font-size: 1.3em;
+	letter-spacing: -0.01em;
+	padding-bottom: 20px;
+	border-bottom: 1px solid #ddd;
+   	}
+
+
+
+.contato_cidade{
+	font-family: Arial;	
+	font-size: 1.6em;
+	font-weight: bold;
+	letter-spacing: -0.05em;
+	color: #363636;
+	padding: 25px 0 10px 0;
+	}
+
+.contato_nome{
+	font-family: Arial;	
+	font-size: 1.2em;
+	font-weight: bold;
+	letter-spacing: -0.01em;
+	color: #363636;
+	}
+
+.contato_funcao{
+	font-family: Arial;	
+	font-size: 1em;
+	letter-spacing: -0.01em;
+	color: #363636;	
+
+	}
+	
+	
+.contato_tel{
+	background-image: url("/po/an/m/mediakit/img/icon_tel.jpg");
+	background-repeat:no-repeat;
+	font-family: Arial;	
+	font-size: 1.1em;
+	font-weight: bold;
+	letter-spacing: -0.01em;
+	color: #363636;	
+	padding: 5px 0px 5px 30px;
+	margin-top: 15px;
+	display: block;
+	height:18px;
+	}
+	
+	
+.contato_email{
+	background-image: url("/po/an/m/mediakit/img/icon_email.jpg");
+	background-repeat:no-repeat;
+	font-family: Arial;	
+	font-size: 1.1em;
+	font-weight: bold;
+	letter-spacing: -0.01em;
+	color: #505d9c;	
+	padding: 5px 0px 30px 30px;
+	display: block;
+	border-bottom: 1px solid #ddd;  
+	}
+	
+#contato{
+	margin: 20px 0 20px 0;
+	}
+
+
+.link {
+	color: #0166dd;	
+    text-decoration:none;
+}
+
+.link:hover {
+    text-decoration:underline;
+    }
+
+.link-white {
+	color: #ffffff;	
+    text-decoration:none;
+}
+
+.link-white:hover {
+    text-decoration:none;
+}
+
+/* ####################### Botao Preview ################## */
+
+.botaopreviewformato {
+	display: block;
+	width: 92px; height: 30px;
+	background-image: url(/po/an/m/mediakit/img/botoes.jpg);
+	background-position: top;
+}
+
+.botaopreviewformato:hover {
+    background-position: center;
+}
+
+.botaopreviewformato:active {
+    background-position: bottom;
+}
+
+.botaopreviewformato .label {
+    position: absolute;
+    font-weight: bold;
+    padding: 8px 12px;
+}
+
+.botaopreviewformato .label {
+    text-decoration: none;
+}
+/* END Botao Preview */
+
+/* ####################### LIGHTBOX ####################### */
+
+#lightbox{
+	background-color:#fff;
+	padding: 5px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	}
+#lightboxDetails{
+	font-size: 0.8em;
+	padding-top: 0.4em;
+	}	
+#lightboxCaption{ float: left; }
+#keyboardMsg{ float: right; }
+
+#lightbox img{ border: none; } 
+#overlay img{ border: none; }
+
+#overlay{ background-image: url(/po/an/m/mediakit/img/overlay.png); }
+
+* html #overlay{
+	background-color: #000;
+	back\ground-color: transparent;
+	background-image: url(/po/an/m/mediakit/img/overlay.png);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/po/an/m/mediakit/img/overlay.png", sizingMethod="scale");
+	}
+
+/* END LIGHTBOX */

@@ -1,0 +1,9 @@
+from django.conf.urls.defaults import *
+from views import *
+
+urlpatterns = patterns('',
+    # Example:
+    ('(?P<site>[0-9A-Za-z_]+)\.html$', site),
+    ('edit/(?P<site>[0-9A-Za-z_]+)\.html$', edit),
+
+)

@@ -1,0 +1,12 @@
+.vTextField {
+	width: 60em !important;
+	height: 3em !important;
+}
+#id_tags, #id_subject, #id_entity {
+	width: 60em !important;
+	height: 3em !important;	
+}
+
+.textAnalysis {
+	color: red !important;
+}

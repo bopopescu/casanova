@@ -1,6 +1,0 @@
-1 - Extrair Tag
-		sintagma nominal
-2 - Classificar os documentos 
-	descobrir as clasificacoes mais frequentes
-
-
