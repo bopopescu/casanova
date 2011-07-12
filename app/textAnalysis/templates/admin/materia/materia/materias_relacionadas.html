@@ -1,0 +1,29 @@
+<script>
+function classify() {
+
+	corpo = CKEDITOR.instances.id_corpo.getSnapshot();
+	titulo = $("#id_titulo").val();
+	subtitulo = $("#id_subtitulo").val();
+	
+   bodyContent = $.ajax({
+         url: "/classify/",
+         global: false,
+         type: "POST",
+         data: ({texto : corpo, titulo : titulo, subtitulo : subtitulo,}),
+         dataType: "html",
+         async:false,
+         success: function(items){
+				var saibaMais = '<div class="saibamais componente_materia"><strong>saiba mais</strong><ul>{items}</ul></div><p></p>'.replace('{items}', items);
+				$("#materias_relacionadas").insertHtml(saibaMais);
+         }
+      }
+   ).responseText;
+
+}
+</script>
+
+<div id="form-row">
+	<label for="busca_materias_relacionadas">Matérias Relacionadas</label>
+	<input type=button name=generate value='javascript:classify()'>
+	<div id="materias_relacionadas"></div>
+</div>
