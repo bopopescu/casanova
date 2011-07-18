@@ -1,0 +1,9 @@
+{% load resize_image %}
+{% for materia in saibamais %}
+	<li class="items">
+		{%if materia.thumbnail%}
+		<img src='{{materia.thumbnail}}' /> 
+		{%endif%}
+		<a href='{{materia.get_full_url}}'>{{materia.titulo}}</a>
+	</li>
+{% endfor %}
