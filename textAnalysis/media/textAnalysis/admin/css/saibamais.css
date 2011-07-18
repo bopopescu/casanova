@@ -1,0 +1,42 @@
+#saibamais {
+padding-top: 10px;
+}
+
+#saibamais input {
+padding-top: 10px;
+}
+#saibamais ul {
+padding-top: 10px;
+}
+
+#saibamais ul li {
+float: left;
+padding: 5px 0;
+list-style: none inside;
+}
+
+#saibamais ul li img {
+width: 45px;
+height: 45px;
+padding-right: 5px;
+float: left;
+}
+
+
+.droparea {
+float: right;
+background-color: #EFEFE0;
+border: 1px solid #EFEFE0;
+width: 250px;
+min-height: 200px;
+}
+
+.droparea img {
+margin: 5px;
+}
+
+.dropareahover {
+background-color: #EFD2A4;
+border-color: #DFA853;
+}
+
