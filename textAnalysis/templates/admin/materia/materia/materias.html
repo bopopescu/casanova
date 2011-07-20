@@ -1,9 +1,11 @@
 {% load resize_image %}
+<ul>
 {% for materia in saibamais %}
-	<li class="items">
+	<li >
 		{%if materia.thumbnail%}
-		<img src='{{materia.thumbnail}}' /> 
+		<img style="width: 60px; height: 45px; padding-right: 5px; float: left;" src='{{materia.thumbnail}}' /> 
 		{%endif%}
 		<a href='{{materia.get_full_url}}'>{{materia.titulo}}</a>
 	</li>
 {% endfor %}
+</ul>

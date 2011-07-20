@@ -28,9 +28,16 @@ pre_extensible_area.connect( stylesheets_adicionais,
     sender=ExtensibleArea(area='css', on='admin/materia/adicionar.html')
 )
 
-def saibamais(sender, context, request, content, **kw):
-    content.write(render_to_string('admin/materia/materia/saibamais.html'))
-    
-pre_extensible_area.connect( saibamais,
-    sender=ExtensibleArea(area='materia-metadados', on='admin/materia/adicionar.html')
-)
+# def saibamais(sender, context, request, content, **kw):
+#     content.write(render_to_string('admin/materia/materia/saibamais.html'))
+#     
+# pre_extensible_area.connect( saibamais,
+#     sender=ExtensibleArea(area='materia-metadados', on='admin/materia/adicionar.html')
+# )
+# 
+# def saibamais(sender, context, request, content, **kw):
+#     content.write(render_to_string('admin/materia/materia/saibamais.html'))
+#     
+# pre_extensible_area.connect( saibamais,
+#     sender=ExtensibleArea(area='javascript_bottom', on='admin/geral.html')
+# )

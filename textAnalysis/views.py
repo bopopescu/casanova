@@ -50,7 +50,7 @@ def classify(request):
                 imagem = m.obtem_caminho_absoluto_de_delivery_do_thumbnail_para_plantao()
                 if imagem:
                     imagem = re.sub('http://anotherdomain.localhost:8000/po/tt/f/',
-                                    'http://s.glbimg.com/jo/g1/f/',
+                                    'http://s.glbimg.com/po/tt/f/',
                                     imagem)
                     m.thumbnail = imagem
                 else:

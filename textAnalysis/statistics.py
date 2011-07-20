@@ -14,4 +14,5 @@ def extrair_tags(texto):
             tags += [(item, wordfreq.get(item))]
             if (len(tags) > 2):
                 break
+    print tags
     return tags
