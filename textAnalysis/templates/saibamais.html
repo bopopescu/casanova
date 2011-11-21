@@ -1,0 +1,97 @@
+<style>
+.componente_materia {
+    clear: both;
+    float: left;
+    margin: 0 1.75em 1em 0;
+    position: relative;
+}
+.componente_materia .toolbar {
+    background: none repeat scroll 0 0 #0167FF;
+    height: 16px;
+    left: 0;
+    list-style: none outside none;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+.componente_materia .toolbar.on {
+    background: none repeat scroll 0 0 #0167FF;
+}
+
+.foto strong {
+    -moz-background-inline-policy: continuous;
+    background: none repeat scroll 0 0 #EEEEEE;
+    display: block;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.67em;
+    text-align: left;
+}
+.foto img {
+    display: block;
+    margin-right: 0 !important;
+}
+.saibamais {
+    padding: 0 0 1em;
+    width: 291px;
+}
+.saibamais strong {
+    border-bottom: 1px solid #DDDDDD;
+    border-top: 4px solid #333333;
+    display: block;
+    font-size: 1.5em;
+    font-weight: normal;
+    letter-spacing: -0.05em;
+    margin: 0 !important;
+    padding: 0.25em 0 0.4em;
+}
+.saibamais ul {
+    clear: both;
+}
+.saibamais ul li {
+    border-bottom: 1px solid #DDDDDD;
+    margin-bottom: 0;
+    overflow: hidden;
+    padding: 0.66em 0;
+}
+.saibamais ul li a {
+    color: #0066FF !important;
+    font-size: 14px;
+}
+.saibamais.expandido {
+    width: 600px;
+}
+</style>
+<script>
+	$('#criterio').html("");
+	$('#criterio').append(new Option('todos', 'todos'));
+
+	{%for word in words%}
+		{%if word == selected%}
+			$('#criterio').append(new Option('{{word}}', '{{word}}', true, true));
+		{%else%}
+			$('#criterio').append(new Option('{{word}}', '{{word}}'));
+		{%endif%}
+	{%endfor%}
+
+</script>
+
+<div class="saibamais componente_materia">
+<ul>
+{%if materias%}
+	{% for materia in materias %}
+		<li>
+			{%if materia.thumbnail%}
+			<div class="foto componente_materia midia-largura-60">
+			<img width="60" height="45" title="{{materia.titulo}}" alt="{{materia.titulo}}" src='{{materia.thumbnail}}' /> 
+			</div>
+			{%endif%}
+			<a href='{{materia.get_full_url}}'>{{materia.titulo}}</a>
+		</li>
+	{% endfor %}
+{%else%}
+	<li>
+	</li>
+{%endif%}
+</ul>
+</div>

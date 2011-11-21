@@ -1,0 +1,54 @@
+<script>
+function SuggestSaibaMais() {
+    
+    if ($('#materia_form').length) {
+    	corpo = CKEDITOR.instances.id_corpo.getSnapshot();
+    	titulo = $("#id_titulo").val()
+    	subtitulo = $("#id_subtitulo").val()
+    	permalink = $('#id_permalink').val()
+    	colaborador = $('#id_colaborador').val()
+    	entidades = []
+        $('.selecionadas input[name*=entidade]').each(function(){
+            entidades.push($(this).val());
+        })
+    	editorias = []
+        $('.editoria input[type=hidden]').each(function(){
+            editorias.push($(this).val());
+        })
+        params = {'texto' : corpo, 
+                 'titulo' : titulo, 
+                 'subtitulo' : subtitulo,
+                 'permalink' : permalink, 
+                 'entidades' : entidades.join(),
+                 'colaborador' : colaborador,
+                 'editorias' : editorias.join(),
+				 'criterio': $('#criterio').val(), }
+             
+    } else {
+        params = {}
+    }
+    
+    bodyContent = $.ajax({
+         url: "/classify/",
+         global: false,
+         type: "POST",
+         data: (params),
+         dataType: "html",
+         async:false,
+         success: function(msg){
+        }
+    }).responseText;
+    $('#materias_relacionadas').html(bodyContent);
+}
+
+</script>
+
+<div id="recomendar-materias">
+	<h3 class="titulo-metadados">Matérias Recomendadas</h3>
+	Escolha o critério:
+	<select id="criterio">
+		<option value="todos">todos</option>
+	</select>
+	<input type="button" value="Recomendar" onclick="javascript:SuggestSaibaMais()"/>
+	<div id="materias_relacionadas"></div>
+</div>
