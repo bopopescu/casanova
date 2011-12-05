@@ -38,7 +38,7 @@ def querySolr(query, total=50):
         consulta = solr_connection.query(query + " isIssued:true type:texto publisher:G1 ", qf='title^5 body', wt='json', start=0, rows=total,
                                    indent='on', sort='score desc, issued', sort_order='desc', )
 
-        print "materias ==>", len(consulta.results), query
+        # print "materias ==>", len(consulta.results), query
         if consulta.results:
             # materias += [(materia, materia['score'] ) for materia in consulta.results]
             materias += consulta.results
@@ -80,7 +80,7 @@ def better_words_from_doc(doc, editorias=True):
     _trigrams = better_words(words)
     words = _unigrams + _bigrams + _trigrams
     query = [' OR '.join('(title:(%s) %s)'% (tag,q_editorias) for tag in words)]
-    
+
     return query, words
 
 # def consulta_unigrams_in_title(doc):

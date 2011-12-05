@@ -8,6 +8,7 @@ from django.conf import settings
 import re
 from textAnalysis.estrategia_consulta import *
 from textAnalysis.utils import *
+from textAnalysis.ltask import *
 
 
 def remove_host(url):
@@ -35,127 +36,40 @@ def monta_doc(m):
 class Command(BaseCommand): 
     
     def handle(self, *args, **options):
-        total = 1000
+        total = 50
         materias = Materia.objects.filter(status='T')[:total]
         contador = 0
-        estrategias = []
-        estrategias.append(Estrategia(consulta_unigrams_in_title))
-        # estrategias.append(Estrategia(consulta_bigrams_in_title))
-        # estrategias.append(Estrategia(consulta_trigrams_in_title))    
-        # estrategias.append(Estrategia(consulta_na_categoria))
+
+
         for m in materias:
             documento = monta_doc(m)
+            query, words = better_words_from_doc(documento)
+            ltask = lTask()
             
-            query = ""
-            for e in estrategias:
-                if query:
-                    query += " OR "
-                query += e.query(documento)[0]            
+            corpo = clean(extract_text_from_p(documento['texto']),remove_signs=False)
+            texto = "%s %s %s" % (documento['titulo'],documento['subtitulo'], corpo)
             
-            recomendadas = []
-            recomendadas = [str(recomendada.url) for (recomendada, score) in relacionadas(documento, 15, query)]
-            encontradas = documento['relacionadas'].intersection(recomendadas)
-            if any(encontradas):
-                contador +=1
+            entidades=[]
+            entidades = ltask.html(texto)
+            entidades += [(query,"QUERY")]
+            
+            # import pdb; pdb.set_trace();
+            
+            for (entidade,tipo) in entidades:
+                # print m.id, entidade, tipo
+                if tipo == "QUERY":
+                    query = entidade
+                else:
+                    query = ["title:(%s)" % entidade]
+                
+                materiasSolr = relacionadas(documento, 5, query[0])
+                recomendadas = []
+                recomendadas = [str(recomendada.url) for (recomendada, score) in materiasSolr]
+                encontradas = documento['relacionadas'].intersection(recomendadas)
+                if any(encontradas):
+                    contador +=1
+                    # print contador
+                    break
 
         print "acerto=>", contador*1.0/len(materias),contador, len(materias)
 
-        total = 1000
-        materias = Materia.objects.filter(status='T')[:total]
-        contador = 0
-        estrategias = []
-        # estrategias.append(Estrategia(consulta_unigrams_in_title))
-        estrategias.append(Estrategia(consulta_bigrams_in_title))
-        # estrategias.append(Estrategia(consulta_trigrams_in_title))    
-        # estrategias.append(Estrategia(consulta_na_categoria))
-        for m in materias:
-            documento = monta_doc(m)
-            
-            query = ""
-            for e in estrategias:
-                if query:
-                    query += " OR "
-                query += e.query(documento)[0]            
-            
-            recomendadas = []
-            recomendadas = [str(recomendada.url) for (recomendada, score) in relacionadas(documento, 15, query)]
-            encontradas = documento['relacionadas'].intersection(recomendadas)
-            if any(encontradas):
-                contador +=1
-
-        print "acerto=>", contador*1.0/len(materias),contador, len(materias)
-
-        total = 1000
-        materias = Materia.objects.filter(status='T')[:total]
-        contador = 0
-        estrategias = []
-        # estrategias.append(Estrategia(consulta_unigrams_in_title))
-        # estrategias.append(Estrategia(consulta_bigrams_in_title))
-        estrategias.append(Estrategia(consulta_trigrams_in_title))    
-        # estrategias.append(Estrategia(consulta_na_categoria))
-        for m in materias:
-            documento = monta_doc(m)
-            
-            query = ""
-            for e in estrategias:
-                if query:
-                    query += " OR "
-                query += e.query(documento)[0]            
-            
-            recomendadas = []
-            recomendadas = [str(recomendada.url) for (recomendada, score) in relacionadas(documento, 15, query)]
-            encontradas = documento['relacionadas'].intersection(recomendadas)
-            if any(encontradas):
-                contador +=1
-
-        print "acerto=>", contador*1.0/len(materias),contador, len(materias)
-        
-        total = 1000
-        materias = Materia.objects.filter(status='T')[:total]
-        contador = 0
-        estrategias = []
-        estrategias.append(Estrategia(consulta_unigrams_in_title))
-        estrategias.append(Estrategia(consulta_bigrams_in_title))
-        # estrategias.append(Estrategia(consulta_trigrams_in_title))    
-        # estrategias.append(Estrategia(consulta_na_categoria))
-        for m in materias:
-            documento = monta_doc(m)
-            
-            query = ""
-            for e in estrategias:
-                if query:
-                    query += " OR "
-                query += e.query(documento)[0]            
-            
-            recomendadas = []
-            recomendadas = [str(recomendada.url) for (recomendada, score) in relacionadas(documento, 15, query)]
-            encontradas = documento['relacionadas'].intersection(recomendadas)
-            if any(encontradas):
-                contador +=1
-
-        print "acerto=>", contador*1.0/len(materias),contador, len(materias)
-        
-        total = 1000
-        materias = Materia.objects.filter(status='T')[:total]
-        contador = 0
-        estrategias = []
-        estrategias.append(Estrategia(consulta_unigrams_in_title))
-        estrategias.append(Estrategia(consulta_bigrams_in_title))
-        estrategias.append(Estrategia(consulta_trigrams_in_title))    
-        # estrategias.append(Estrategia(consulta_na_categoria))
-        for m in materias:
-            documento = monta_doc(m)
-            
-            query = ""
-            for e in estrategias:
-                if query:
-                    query += " OR "
-                query += e.query(documento)[0]            
-            
-            recomendadas = []
-            recomendadas = [str(recomendada.url) for (recomendada, score) in relacionadas(documento, 15, query)]
-            encontradas = documento['relacionadas'].intersection(recomendadas)
-            if any(encontradas):
-                contador +=1
-
-        print "acerto=>", contador*1.0/len(materias),contador, len(materias)

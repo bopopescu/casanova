@@ -6,6 +6,9 @@ import re
 from globocore.estrutura.models import Folder
 from lxml import html as lhtml
 from estrategia_consulta import *
+from textAnalysis.ner import *
+from textAnalysis.utils import *
+
 
 
 def alterar_path_imagens(imagem):
@@ -62,8 +65,18 @@ def classify(request):
                 query, words = better_words_from_doc(documento)
             else:
                 query, words = words_relacionadas(selected)
+            
+            # corpo = clean(extract_text_from_p(documento['texto']), remove_signs=False)
+            # texto = "%s %s %s" % (documento['titulo'],documento['subtitulo'], corpo)
+            # 
+            # ltask = lTask()
+            # entidades = ltask.html(texto)
+            # words =[]
+            # for (entidade,tipo) in entidades:
+            #     words += [entidade]
 
             materiasSolr = relacionadas(documento, 5, query[0])
+            
             for (mSolr,v) in materiasSolr:
                 idMateria = re.search('(?<=[a-z]/)[0-9]+', mSolr.identifier).group(0)
                 try:
