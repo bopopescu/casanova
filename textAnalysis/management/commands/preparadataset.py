@@ -9,7 +9,6 @@ import re
 from textAnalysis.estrategia_consulta import *
 from textAnalysis.utils import *
 
-
 def remove_host(url):
     return re.sub(settings.BASE_URL,
                     "",
@@ -44,20 +43,25 @@ class Command(BaseCommand):
         datainicio = datetime.datetime(day=1,month=10,year=2011)
         datafim = datetime.datetime(day=31,month=10,year=2011)
         
-        materias = Materia.objects.filter(corpo__icontains='saibamais', ultima_publicacao__gt=datainicio, ultima_publicacao__lt=datafim)[:2000]
+        materias = Materia.objects.filter(corpo__icontains='saibamais', ultima_publicacao__gt=datainicio, ultima_publicacao__lt=datafim)[:2200]
+        # materias = Materia.objects.filter(status='T', id = 480081)
         for m in materias:
             validas +=1
             html = lhtml.fromstring(m.corpo.decode('utf-8'))
             documento['relacionadas'] = set([ change_host(h.attrib['href']).lower() for h in html.cssselect('.saibamais ul li a')])            
-
             for uri in documento['relacionadas']:
                 if link_e_valido(remove_host(uri)):
                     if not esta_no_solr(remove_host(uri)):
-                        m.notifica_barramento("publicar")
-                    
-                    if len(Materia.objects.filter(status='T'))<1000:
-                        m.status = 'T'
-                        m.save()
+                        try:
+                            m1 = Materia.objects.get(permalink=remove_host(uri))
+                            m1.status = 'P'
+                            m1.save()
+                            m1.notifica_barramento("publicar")
+                            if len(Materia.objects.filter(status='T'))<1000:
+                                m.status = 'T'
+                                m.save()
+                        except:
+                            pass
                 else:
                     validas -=1
                     break

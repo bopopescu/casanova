@@ -6,6 +6,8 @@ import datetime
 
 from globocore.materia.models import Materia
 from textAnalysis.materia_do_solr import MateriaDoSolr 
+from textAnalysis.ner import *  
+
 
 def periodo(doc, time=2000):
     if doc['permalink']:
@@ -35,7 +37,7 @@ def querySolr(query, total=50):
     solr_connection = SolrConnection(settings.SOLRSERVER)
     query = query.encode('utf-8')
     try:
-        consulta = solr_connection.query(query + " isIssued:true type:texto publisher:G1 ", qf='title^5 body', wt='json', start=0, rows=total,
+        consulta = solr_connection.query(query + " isIssued:true type:texto publisher:G1 ", wt='json', start=0, rows=total,
                                    indent='on', sort='score desc, issued', sort_order='desc', )
 
         # print "materias ==>", len(consulta.results), query
@@ -58,59 +60,75 @@ def consulta_editoria(doc):
         queries = ' AND (%s) ' % queries[0]
     return queries
         
-
-def better_words_from_doc(doc, editorias=True):
-    text = "%s %s %s" % (doc['titulo'],doc['subtitulo'],doc['texto'])
+def word_frequency(doc, editorias=True):
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
     q_editorias = ""
-    if editorias:
-        q_editorias = consulta_editoria(doc)
+    # if editorias:
+    #     q_editorias = consulta_editoria(doc)
         
     words = tf(text)
     words = sorted_dict_by_value(words)
-    _unigrams = better_words(words) 
-    
-    words = bag_of_words(text, remove_stopwords=True)
-    words = bigrams(words)
-    words = [word for word in words if is_valid_bigram(word)]
-    _bigrams = better_words(words)
-    
-    words = bag_of_words(text, remove_stopwords=False)
-    words = trigrams(words)
-    words = [word for word in words if is_valid_trigram(word)]
-    _trigrams = better_words(words)
-    words = _unigrams + _bigrams + _trigrams
+    words = better_words(words) 
+
+    # print words
     query = [' OR '.join('(title:(%s) %s)'% (tag,q_editorias) for tag in words)]
 
     return query, words
 
-# def consulta_unigrams_in_title(doc):
-#     queries = []
-#     text = "%s %s %s" % (doc['titulo'],doc['subtitulo'],doc['texto'])
-#     words = tf(text)
-#     words = sorted_dict_by_value(words)
-#     words = better_words(words) 
-#     queries = [' OR '.join('(title:(%s) %s)'% (tag,consulta_editoria(doc)) for tag in words)]
-#     return queries
-# 
-# def consulta_bigrams_in_title(doc):
-#     queries = []
-#     text = "%s %s %s" % (doc['titulo'],doc['subtitulo'],doc['texto'])
-#     words = bag_of_words(text, remove_stopwords=True)
-#     words = bigrams(words)
-#     words = [word for word in words if is_valid_bigram(word)]
-#     words = better_words(words) 
-#     queries = [' OR '.join('(title:(%s) %s)'% (tag,consulta_editoria(doc)) for tag in words)]
-#     return queries
-# 
-# def consulta_trigrams_in_title(doc):
-#     queries = []
-#     text = "%s %s %s" % (doc['titulo'],doc['subtitulo'],doc['texto'])
-#     words = bag_of_words(text, remove_stopwords=False)
-#     words = trigrams(words)
-#     words = [word for word in words if is_valid_trigram(word)]
-#     words = better_words(words) 
-#     queries = [' OR '.join('(title:(%s) %s)'% (tag,consulta_editoria(doc)) for tag in words)]
-#     return queries
+
+
+def entidades(doc, editorias=True):
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
+    words = my_fastercts(text)
+    q_editorias = ""
+    if editorias:
+        q_editorias = consulta_editoria(doc)
+    query = [' OR '.join('(title:(%s) %s)'% (tag,q_editorias) for tag in words)]
+    
+    return query, words
+
+
+def single_words_entities(doc, editorias=True):
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
+    text = clean(text, separador=' ')
+    q_editorias = ""
+    if editorias:
+        q_editorias = consulta_editoria(doc)
+    words = text.split()
+    stop = stopwords()
+    tags={}
+    for word in words:
+        if word not in stop and len(word)>2 and not word.isdigit():
+            if tags.has_key(word):
+                tags[word]+=1
+            else:
+                tags[word]=1
+
+    _unigrams = sorted_dict_by_value(tags)
+    _unigrams = better_words(_unigrams) 
+    words = _unigrams 
+    
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
+    entities = my_fastercts(text)
+    
+    # [it for it in itertools.combinations('ABCD',3)]
+
+    # Aumento de 43% para 59%
+    
+    print words
+    
+    for ent in entities:
+        if ent not in words:
+            words.append(ent)
+            
+    print entities
+    
+    query = [' OR '.join('(%s)' % tag for tag in words)]
+    
+    if q_editorias:
+        query = ['((%s) %s)' % (query[0], q_editorias)]
+    
+    return query, words
 
 def relacionadas(documento, total, query):
     materias = []
@@ -126,7 +144,7 @@ def relacionadas(documento, total, query):
                 # nao coloca materias duplicadas na lista
                 if not any([m.title == mSolr.title for (m,vsm) in materias]):
                     vsm = 1
-                    vsm = VSM(documento['titulo'], mSolr.title)*10
+                    # vsm = VSM(documento['titulo'], mSolr.title)*10
                     score = vsm*peso
                     materias += [(mSolr,score)]
         except:
@@ -144,12 +162,12 @@ def words_relacionadas(ngram):
     for materiaSolr in materiasSolr:
         mSolr = MateriaDoSolr(materiaSolr)
         big_text += (" " + mSolr.body) 
-    
+        
     words = tf(big_text)
     words = sorted_dict_by_value(words)
     _unigrams = better_words(words)
 
-    words = bag_of_words(big_text, remove_stopwords=True, remove_verbos=False)
+    words = bag_of_words(big_text, remove_stopwords=True)
     words = bigrams(words)
     _bigrams = better_words(words)
 

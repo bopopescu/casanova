@@ -12,16 +12,22 @@ from nltk.metrics import BigramAssocMeasures, TrigramAssocMeasures
 from lxml import html as lhtml
 import unicodedata
 import pickle
+import random
 
-# python train_tagger.py mac_morpho --sequential au --fraction 0.8 --filename macmorpo_sed_tagger.pickle
+# python train__tagger.py mac_morpho --sequential au --fraction 0.8 --filename macmorpo_sed__tagger.pickle
+# removendo acentuacao e letras maiusculas
 # 51397 tagged sents, training on 41118
 # training AffixTagger with affix -3 and backoff <DefaultTagger: tag=-None->
-# training <class 'nltk.tag.sequential.UnigramTagger'> tagger with backoff <AffixTagger: size=5232>
-# evaluating UnigramTagger
-# accuracy: 0.865133
-# dumping UnigramTagger to macmorpo_sed_tagger.pickle
+# training <class 'nltk.tag.sequential.UnigramTagger'> _tagger with backoff <AffixTagger: size=6218>
+# training <class 'nltk.tag.sequential.BigramTagger'> _tagger with backoff <UnigramTagger: size=21175>
+# training <class 'nltk.tag.sequential.TrigramTagger'> _tagger with backoff <BigramTagger: size=11323>
+# evaluating TrigramTagger
+# accuracy: 0.898660
 
-tagger = nltk.data.load("taggers/macmorpo_sed_tagger.pickle")
+def tagger():
+    return nltk.data.load("taggers/macmorpo_sed_tagger_case.pickle")
+
+_tagger = tagger()
 
 def unescape(text):
     def fixup(m):
@@ -43,13 +49,15 @@ def unescape(text):
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
 
-def clean(text): 
+def clean(text, separador='.'): 
     text = clean_html(text)
     text = unescape(text)
     text = normalize(text)
-    text = re.sub(r"[.,?:;!\|_+=)(*&\^/><@#%\]\}\[\{\"\'\~\`]", r'.', text)
-    text = re.sub(r"[\n\t\r]", r'', text)
-    text = re.sub(r"[0-9]", r' 000 ', text)
+    text = re.sub(r"[.,?:;!\|_+=)(*&\^/><@#%\]\}\[\{\"\'\~\`]", separador, text)
+    text = re.sub(r"[\n\t\r]", r' ', text)
+    text = re.sub(r"[\-]", r' ', text)
+    
+    # text = re.sub(r"[0-9]", r' ', text)
     return text
 
 def colocation(text,n, ini, fim):
@@ -76,9 +84,10 @@ def normalize(text):
         except:
             text = str(text).decode("iso8859-1")
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore")
-    return text.lower()
+    return text #.lower()
 
-def extrai_ngram(text,n=4):
+
+def extrai_ngram(text,n=3):
     words = []
     text = clean(text)
     
@@ -101,11 +110,18 @@ def extrai_ngram(text,n=4):
 
 
 def extract_text_from_p(html):
+    if not html:
+        return html
+    
     text = ""
+    # contorno para resolver problema semantica
+    html = re.sub(r'<a class="remover">x</a>', r'', html)
+    html = re.sub(r'<br>', r' ', html)
+    
     html = lhtml.fromstring(html)
     for pdata in html.cssselect('p'):
-        if pdata.text:
-            text += pdata.text
+        if pdata.text_content():
+            text += pdata.text_content()
     return text
 
 def stopwords():
@@ -114,8 +130,10 @@ def stopwords():
 
 def entities():
     words = nltk.data.load("entidades", format='raw').decode("utf8")  
-    return set([normalize(word) for word in words.split("\n") if not normalize(word) in stopwords()])
-
+    words =  [normalize(word.strip()) for word in words.split("\n") if not normalize(word) in stopwords() and normalize(word) and len(word.split())<=3]
+    random.shuffle(words)
+    return set(words) 
+    
 def bigrams(words, score_fn=BigramAssocMeasures.chi_sq, n=200):
     bigram_finder = BigramCollocationFinder.from_words(words)
     words = bigram_finder.ngram_fd.items()
@@ -126,22 +144,12 @@ def trigrams(words, score_fn=TrigramAssocMeasures.chi_sq, n=200):
     words = trigram_finder.ngram_fd.items()
     return [word for word in words if is_valid_trigram(word)]
 
-def bag_of_words(texto, remove_stopwords=False):
-    words = clean(texto).split()
-    if remove_stopwords:
-        stop = stopwords()
-        words = [word for word in words if word not in stop and len(word)>2 ]
-    words = [word for word in words if not word.isdigit()]
-    return words
-
 def tf(texto):
-    texto = texto.decode("utf-8")
-    words = bag_of_words(texto, remove_stopwords=True)
-    tagger = nltk.data.load("taggers/mac_morpho_aubt.pickle")
-    tags = {}
-    for word in words:
-        if  is_valid_unigram(word):
-            # word = word.lower()
+    words = extrai_ngram(texto, n=3)
+    stop = stopwords()
+    tags={}
+    for (word,i,f) in words:
+        if word not in stop and not word.isdigit() and is_valid_ngram(word):
             if tags.has_key(word):
                 tags[word]+=1
             else:
@@ -150,13 +158,13 @@ def tf(texto):
 
 def better_words(words):
     lista=[]
-    media = (words[0][1]+words[len(words)-1][1])/2
-    for (word, freq) in words:
-        if type(word)==tuple:
-            word=" ".join(word)
-        if freq >= media and len(lista)<=10:
-            # print word, freq, media
-            lista.append(word)
+    if words:
+        media = (words[0][1]+words[len(words)-1][1])/2
+        for (word, freq) in words:
+            if type(word)==tuple:
+                word=" ".join(word)
+            if freq >= media and len(lista)<=10:
+                lista.append(word)
     return lista
 
     # dist={}
@@ -229,130 +237,131 @@ def jaccard(texto1, texto2):
 
 
 def is_valid_trigram(t):
-    if (tagger.tag([t[0][2]])[0][1]=='PCP' or tagger.tag([t[0][0]])[0][1]=='PCP' ):
+    if (_tagger.tag([t[0][2]])[0][1]=='PCP' or _tagger.tag([t[0][0]])[0][1]=='PCP' ):
         return False
-    if (tagger.tag([t[0][2]])[0][1]=='ADV-KS-REL' or tagger.tag([t[0][0]])[0][1]=='ADV-KS-REL' ):
+    if (_tagger.tag([t[0][2]])[0][1]=='ADV-KS-REL' or _tagger.tag([t[0][0]])[0][1]=='ADV-KS-REL' ):
         return False
-    if (tagger.tag([t[0][2]])[0][1]=='KS' or tagger.tag([t[0][0]])[0][1]=='KS' ):
+    if (_tagger.tag([t[0][2]])[0][1]=='KS' or _tagger.tag([t[0][0]])[0][1]=='KS' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='KC' or tagger.tag([t[0][2]])[0][1]=='KC' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='KC' or _tagger.tag([t[0][2]])[0][1]=='KC' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='PREP' or tagger.tag([t[0][2]])[0][1]=='PREP' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='PREP' or _tagger.tag([t[0][2]])[0][1]=='PREP' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='V' or tagger.tag([t[0][2]])[0][1]=='V' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='V' or _tagger.tag([t[0][2]])[0][1]=='V' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='VAUX' or tagger.tag([t[0][2]])[0][1]=='VAUX' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='VAUX' or _tagger.tag([t[0][2]])[0][1]=='VAUX' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='ART' or tagger.tag([t[0][2]])[0][1]=='ART' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='ART' or _tagger.tag([t[0][2]])[0][1]=='ART' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='ADV' or tagger.tag([t[0][2]])[0][1]=='ADV' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='ADV' or _tagger.tag([t[0][2]])[0][1]=='ADV' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='NUM' or tagger.tag([t[0][2]])[0][1]=='NUM' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='NUM' or _tagger.tag([t[0][2]])[0][1]=='NUM' ):
         return False          
-    if (tagger.tag([t[0][0]])[0][0]=='no' or tagger.tag([t[0][2]])[0][0]=='na' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='no' or _tagger.tag([t[0][2]])[0][0]=='na' ):
         return False
-    if (tagger.tag([t[0][0]])[0][0]=='nos' or tagger.tag([t[0][2]])[0][0]=='nas' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='nos' or _tagger.tag([t[0][2]])[0][0]=='nas' ):
         return False
-    if (tagger.tag([t[0][0]])[0][0]=='do' or tagger.tag([t[0][2]])[0][0]=='da' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='do' or _tagger.tag([t[0][2]])[0][0]=='da' ):
         return False
-    if (tagger.tag([t[0][0]])[0][0]=='dos' or tagger.tag([t[0][2]])[0][0]=='das' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='dos' or _tagger.tag([t[0][2]])[0][0]=='das' ):
         return False
-    if (tagger.tag([t[0][0]])[0][0]=='em' or tagger.tag([t[0][2]])[0][0]=='entre' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='em' or _tagger.tag([t[0][2]])[0][0]=='entre' ):
         return False
-    if (tagger.tag([t[0][2]])[0][0]=='no' or tagger.tag([t[0][0]])[0][0]=='na' ):
+    if (_tagger.tag([t[0][2]])[0][0]=='no' or _tagger.tag([t[0][0]])[0][0]=='na' ):
         return False
-    if (tagger.tag([t[0][2]])[0][0]=='nos' or tagger.tag([t[0][0]])[0][0]=='nas' ):
+    if (_tagger.tag([t[0][2]])[0][0]=='nos' or _tagger.tag([t[0][0]])[0][0]=='nas' ):
         return False
-    if (tagger.tag([t[0][2]])[0][0]=='do' or tagger.tag([t[0][0]])[0][0]=='da' ):
+    if (_tagger.tag([t[0][2]])[0][0]=='do' or _tagger.tag([t[0][0]])[0][0]=='da' ):
         return False
-    if (tagger.tag([t[0][2]])[0][0]=='dos' or tagger.tag([t[0][0]])[0][0]=='das' ):
+    if (_tagger.tag([t[0][2]])[0][0]=='dos' or _tagger.tag([t[0][0]])[0][0]=='das' ):
         return False
-    if (tagger.tag([t[0][2]])[0][0]=='em' or tagger.tag([t[0][0]])[0][0]=='entre' ):
+    if (_tagger.tag([t[0][2]])[0][0]=='em' or _tagger.tag([t[0][0]])[0][0]=='entre' ):
         return False
-    if (tagger.tag([t[0][2]])[0][0]=='nesta' or tagger.tag([t[0][0]])[0][0]=='nesta' ):
+    if (_tagger.tag([t[0][2]])[0][0]=='nesta' or _tagger.tag([t[0][0]])[0][0]=='nesta' ):
         return False
-    if (tagger.tag([t[0][2]])[0][0]=='r' or tagger.tag([t[0][0]])[0][0]=='r' ):
+    if (_tagger.tag([t[0][2]])[0][0]=='r' or _tagger.tag([t[0][0]])[0][0]=='r' ):
         return False
-    if (tagger.tag([t[0][1]])[0][1]=='V'): 
+    if (_tagger.tag([t[0][1]])[0][1]=='V'): 
         return False
-    if (tagger.tag([t[0][1]])[0][1]=='VAUX'):
+    if (_tagger.tag([t[0][1]])[0][1]=='VAUX'):
         return False
-    if (tagger.tag([t[0][1]])[0][1]=='ADV-KS-REL'):
+    if (_tagger.tag([t[0][1]])[0][1]=='ADV-KS-REL'):
         return False
-    if (tagger.tag([t[0][1]])[0][1]=='PCP'):
+    if (_tagger.tag([t[0][1]])[0][1]=='PCP'):
         return False
-    
     
     return True
 
 def is_valid_bigram(t):
-    if (tagger.tag([t[0][0]])[0][1]=='PREP' or tagger.tag([t[0][1]])[0][1]=='PREP' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='PREP' or _tagger.tag([t[0][1]])[0][1]=='PREP' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='VAUX' or tagger.tag([t[0][1]])[0][1]=='VAUX' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='VAUX' or _tagger.tag([t[0][1]])[0][1]=='VAUX' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='V' or tagger.tag([t[0][1]])[0][1]=='V' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='V' or _tagger.tag([t[0][1]])[0][1]=='V' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='ART' or tagger.tag([t[0][1]])[0][1]=='ART' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='ART' or _tagger.tag([t[0][1]])[0][1]=='ART' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='PCP' or tagger.tag([t[0][1]])[0][1]=='PCP' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='PCP' or _tagger.tag([t[0][1]])[0][1]=='PCP' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='ADV' or tagger.tag([t[0][1]])[0][1]=='ADV' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='ADV' or _tagger.tag([t[0][1]])[0][1]=='ADV' ):
         return False
-    if (tagger.tag([t[0][0]])[0][1]=='NUM' or tagger.tag([t[0][1]])[0][1]=='NUM' ):
-        return False          
-    if (tagger.tag([t[0][0]])[0][0]=='no' or tagger.tag([t[0][1]])[0][0]=='na' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='NUM' or _tagger.tag([t[0][1]])[0][1]=='NUM' ):
         return False
-    if (tagger.tag([t[0][0]])[0][0]=='nos' or tagger.tag([t[0][1]])[0][0]=='nas' ):
+    if (_tagger.tag([t[0][0]])[0][1]=='PRO-KS-REL' or _tagger.tag([t[0][1]])[0][1]=='PRO-KS-REL' ):
         return False
-    if (tagger.tag([t[0][0]])[0][0]=='do' or tagger.tag([t[0][1]])[0][0]=='da' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='no' or _tagger.tag([t[0][1]])[0][0]=='na' ):
         return False
-    if (tagger.tag([t[0][0]])[0][0]=='dos' or tagger.tag([t[0][1]])[0][0]=='das' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='nos' or _tagger.tag([t[0][1]])[0][0]=='nas' ):
         return False
-    if (tagger.tag([t[0][0]])[0][0]=='em' or tagger.tag([t[0][1]])[0][0]=='entre' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='do' or _tagger.tag([t[0][1]])[0][0]=='da' ):
         return False
-    if (tagger.tag([t[0][1]])[0][0]=='no' or tagger.tag([t[0][0]])[0][0]=='na' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='dos' or _tagger.tag([t[0][1]])[0][0]=='das' ):
         return False
-    if (tagger.tag([t[0][1]])[0][0]=='nos' or tagger.tag([t[0][0]])[0][0]=='nas' ):
+    if (_tagger.tag([t[0][0]])[0][0]=='em' or _tagger.tag([t[0][1]])[0][0]=='entre' ):
         return False
-    if (tagger.tag([t[0][1]])[0][0]=='do' or tagger.tag([t[0][0]])[0][0]=='da' ):
+    if (_tagger.tag([t[0][1]])[0][0]=='no' or _tagger.tag([t[0][0]])[0][0]=='na' ):
         return False
-    if (tagger.tag([t[0][1]])[0][0]=='dos' or tagger.tag([t[0][0]])[0][0]=='das' ):
+    if (_tagger.tag([t[0][1]])[0][0]=='nos' or _tagger.tag([t[0][0]])[0][0]=='nas' ):
         return False
-    if (tagger.tag([t[0][1]])[0][0]=='em' or tagger.tag([t[0][0]])[0][0]=='entre' ):
+    if (_tagger.tag([t[0][1]])[0][0]=='do' or _tagger.tag([t[0][0]])[0][0]=='da' ):
         return False
-    if (tagger.tag([t[0][1]])[0][0]=='sao'): 
+    if (_tagger.tag([t[0][1]])[0][0]=='dos' or _tagger.tag([t[0][0]])[0][0]=='das' ):
         return False
-    # if (tagger.tag([t[0][1]])[0][1]=='KS'):
+    if (_tagger.tag([t[0][1]])[0][0]=='em' or _tagger.tag([t[0][0]])[0][0]=='entre' ):
+        return False
+    if (_tagger.tag([t[0][1]])[0][0]=='sao'): 
+        return False
+    # if (_tagger.tag([t[0][1]])[0][1]=='KS'):
     #     return False
-    if (tagger.tag([t[0][1]])[0][1]=='PCP'):
+    if (_tagger.tag([t[0][1]])[0][1]=='PCP'):
         return False
         
     return True
     
 def is_valid_unigram(word):
-    if  tagger.tag([word])[0][1]=='V':
+    if  _tagger.tag([word])[0][1]=='V':
         return False
-    if  tagger.tag([word])[0][1]=='VAUX':
+    if  _tagger.tag([word])[0][1]=='VAUX':
         return False
-    if  tagger.tag([word])[0][1]=='KS':
+    if  _tagger.tag([word])[0][1]=='KS':
         return False
-    if  tagger.tag([word])[0][1]=='PREP':
+    if  _tagger.tag([word])[0][1]=='PREP':
         return False   
-    if  tagger.tag([word])[0][1]=='PROADJ':
+    if  _tagger.tag([word])[0][1]=='PROADJ':
         return False  
-    if  tagger.tag([word])[0][1]=='PCP':
+    if  _tagger.tag([word])[0][1]=='PCP':
         return False
-    if  tagger.tag([word])[0][1]=='ADV':
+    if  _tagger.tag([word])[0][1]=='ADV':
         return False
-    if  tagger.tag([word])[0][1]=='NUM':
+    if  _tagger.tag([word])[0][1]=='NUM':
         return False
-    if  tagger.tag([word])[0][0]=='nesta':
+    if  _tagger.tag([word])[0][0]=='nesta':
         return False
-    if  tagger.tag([word])[0][0]=='pela':
+    if  _tagger.tag([word])[0][0]=='pela':
         return False  
-    if  tagger.tag([word])[0][0]=='sao':
+    if  _tagger.tag([word])[0][0]=='sao':
         return False  
-    if  len(tagger.tag([word])[0][0])==1:
+    if  len(_tagger.tag([word])[0][0])==1:
         return False
         
     return True
@@ -374,14 +383,14 @@ def is_valid_ngram(word):
             
     return True
     
-def saveClassifier(classifier, name='BayesModel.pkl'): 
+def saveClassifier(classifier, name='ClassificadorEntity.pkl'): 
     fModel = open(name,"wb") 
     pickle.dump(classifier, fModel,1) 
     fModel.close() 
     os.system("rm %s.gz" % name) 
     os.system("gzip %s" % name) 
 
-def loadClassifier(name='BayesModel.pkl'): 
+def loadClassifier(name='ClassificadorEntity.pkl'): 
     os.system("gunzip %s.gz" % name) 
     fModel = open(name,"rb") 
     classifier = pickle.load(fModel) 

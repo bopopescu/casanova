@@ -62,18 +62,9 @@ def classify(request):
         if documento:
             selected = request.POST.get('criterio') if request.POST.get('criterio') else 'todos'
             if selected == 'todos':
-                query, words = better_words_from_doc(documento)
+                query, words = single_words_entities(documento)
             else:
                 query, words = words_relacionadas(selected)
-            
-            # corpo = clean(extract_text_from_p(documento['texto']), remove_signs=False)
-            # texto = "%s %s %s" % (documento['titulo'],documento['subtitulo'], corpo)
-            # 
-            # ltask = lTask()
-            # entidades = ltask.html(texto)
-            # words =[]
-            # for (entidade,tipo) in entidades:
-            #     words += [entidade]
 
             materiasSolr = relacionadas(documento, 5, query[0])
             
@@ -85,6 +76,8 @@ def classify(request):
                     materias += [m]
                 except:
                     pass
+        materias.sort(key=lambda m: m.ultima_publicacao)
+        materias.reverse()
     except Exception:
         pass
     

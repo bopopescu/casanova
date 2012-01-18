@@ -86,7 +86,7 @@
 			<img width="60" height="45" title="{{materia.titulo}}" alt="{{materia.titulo}}" src='{{materia.thumbnail}}' /> 
 			</div>
 			{%endif%}
-			<a href='{{materia.get_full_url}}'>{{materia.titulo}}</a>
+			<span>{{materia.ultima_publicacao}}</span> - <a href='{{materia.get_full_url}}'>{{materia.titulo}}</a>
 		</li>
 	{% endfor %}
 {%else%}
