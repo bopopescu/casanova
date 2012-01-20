@@ -115,13 +115,13 @@ def single_words_entities(doc, editorias=True):
 
     # Aumento de 43% para 59%
     
-    print words
+    # print words
     
     for ent in entities:
         if ent not in words:
             words.append(ent)
             
-    print entities
+    # print entities
     
     query = [' OR '.join('(%s)' % tag for tag in words)]
     
@@ -132,7 +132,7 @@ def single_words_entities(doc, editorias=True):
 
 def relacionadas(documento, total, query):
     materias = []
-    materiasSolr = querySolr(query)
+    materiasSolr = querySolr(query, total=50)
     for materiaSolr in materiasSolr:
         mSolr = MateriaDoSolr(materiaSolr)
         peso = materiaSolr['score']
@@ -145,6 +145,7 @@ def relacionadas(documento, total, query):
                 if not any([m.title == mSolr.title for (m,vsm) in materias]):
                     vsm = 1
                     # vsm = VSM(documento['titulo'], mSolr.title)*10
+                    # vsm = VSM(extract_text_from_p(documento['texto']), extract_text_from_p(mSolr.body))*10
                     score = vsm*peso
                     materias += [(mSolr,score)]
         except:
