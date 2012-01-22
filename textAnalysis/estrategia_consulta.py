@@ -31,15 +31,16 @@ class Estrategia:
         return []
 
     
-def querySolr(query, total=50):
-    
+def querySolr(words, editorias, total=50):
     materias = []
     solr_connection = SolrConnection(settings.SOLRSERVER)
-    query = query.encode('utf-8')
+    query = [' OR '.join('(%s)' % tag for tag in words)]
+    if editorias:
+        query = ['((%s) %s)' % (query[0], editorias)]
+    query = query[0].encode('utf-8')
     try:
         consulta = solr_connection.query(query + " isIssued:true type:texto publisher:G1 ", wt='json', start=0, rows=total,
                                    indent='on', sort='score desc, issued', sort_order='desc', )
-
         # print "materias ==>", len(consulta.results), query
         if consulta.results:
             # materias += [(materia, materia['score'] ) for materia in consulta.results]
@@ -47,53 +48,23 @@ def querySolr(query, total=50):
     except:
         print "deu pau na query", query
         pass
-            
     solr_connection.close()
     return materias
 
 
-def consulta_editoria(doc):
+def _editorias(doc):
     queries=""
     editorias = doc['editorias']
     if editorias: 
         queries = [' OR '.join("editoria_principal_s:\"%s\" " % editoria.name for editoria in editorias)]
         queries = ' AND (%s) ' % queries[0]
     return queries
-        
-def word_frequency(doc, editorias=True):
-    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
-    q_editorias = ""
-    # if editorias:
-    #     q_editorias = consulta_editoria(doc)
-        
-    words = tf(text)
-    words = sorted_dict_by_value(words)
-    words = better_words(words) 
-
-    # print words
-    query = [' OR '.join('(title:(%s) %s)'% (tag,q_editorias) for tag in words)]
-
-    return query, words
-
-
-
-def entidades(doc, editorias=True):
-    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
-    words = my_fastercts(text)
-    q_editorias = ""
-    if editorias:
-        q_editorias = consulta_editoria(doc)
-    query = [' OR '.join('(title:(%s) %s)'% (tag,q_editorias) for tag in words)]
-    
-    return query, words
 
 
 def single_words_entities(doc, editorias=True):
     text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
     text = clean(text, separador=' ')
-    q_editorias = ""
-    if editorias:
-        q_editorias = consulta_editoria(doc)
+    q_editorias = _editorias(doc)
     words = text.split()
     stop = stopwords()
     tags={}
@@ -107,10 +78,10 @@ def single_words_entities(doc, editorias=True):
     _unigrams = sorted_dict_by_value(tags)
     _unigrams = better_words(_unigrams) 
     words = _unigrams 
-    
+
     text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
     entities = my_fastercts(text)
-    
+
     # [it for it in itertools.combinations('ABCD',3)]
 
     # Aumento de 43% para 59%
@@ -130,9 +101,37 @@ def single_words_entities(doc, editorias=True):
     
     return query, words
 
-def relacionadas(documento, total, query):
+
+
+features = {
+  's': unigram_frequency,
+  # 'h': ngram_frequency,
+  # 'c': my_fastercts,
+  'e': my_fastercts,
+}
+
+def _combina(comb, text):
+    words = []
+    if comb:
+    	for c in comb:
+    		if c not in features:
+    			raise NotImplementedError('%s is not a valid sequential backoff tagger' % c)
+
+    		constructor = features[c]
+    		_words = constructor(text)
+    		for word in _words:
+    		    if word not in words:
+    		        words.append(word)
+    
+    return words
+
+def relacionadas(doc, comb='s' ,total=5):
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
+    words = _combina(comb,text)
+    # q, words = single_words_entities(doc, editorias=True)
     materias = []
-    materiasSolr = querySolr(query, total=50)
+    editorias = _editorias(doc)
+    materiasSolr = querySolr(words, editorias, total=50)
     for materiaSolr in materiasSolr:
         mSolr = MateriaDoSolr(materiaSolr)
         peso = materiaSolr['score']
@@ -140,17 +139,16 @@ def relacionadas(documento, total, query):
         try:
             # m = Materia.objects.get(id = idMateria)
             # remove a propria materia da lista 
-            if documento['titulo'] != mSolr.title:
+            if doc['titulo'] != mSolr.title:
                 # nao coloca materias duplicadas na lista
                 if not any([m.title == mSolr.title for (m,vsm) in materias]):
                     vsm = 1
-                    # vsm = VSM(documento['titulo'], mSolr.title)*10
-                    # vsm = VSM(extract_text_from_p(documento['texto']), extract_text_from_p(mSolr.body))*10
+                    # vsm = VSM(doc['titulo'], mSolr.title)*10
+                    # vsm = VSM(extract_text_from_p(doc['texto']), extract_text_from_p(mSolr.body))*10
                     score = vsm*peso
                     materias += [(mSolr,score)]
         except:
             pass
-
     if materias:
         materias.sort(key=lambda x: -x[1])
     return materias[:total]
@@ -163,15 +161,12 @@ def words_relacionadas(ngram):
     for materiaSolr in materiasSolr:
         mSolr = MateriaDoSolr(materiaSolr)
         big_text += (" " + mSolr.body) 
-        
     words = tf(big_text)
     words = sorted_dict_by_value(words)
     _unigrams = better_words(words)
-
     words = bag_of_words(big_text, remove_stopwords=True)
     words = bigrams(words)
     _bigrams = better_words(words)
-
     words = bag_of_words(big_text, remove_stopwords=False)
     words = trigrams(words)
     _trigrams = better_words(words)

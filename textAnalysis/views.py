@@ -60,13 +60,12 @@ def classify(request):
     try:
         documento = extrair_dados_do_form(request) 
         if documento:
-            selected = request.POST.get('criterio') if request.POST.get('criterio') else 'todos'
-            if selected == 'todos':
-                query, words = single_words_entities(documento)
-            else:
-                query, words = words_relacionadas(selected)
-
-            materiasSolr = relacionadas(documento, 5, query[0])
+            # selected = request.POST.get('criterio') if request.POST.get('criterio') else 'todos'
+            # if selected == 'todos':
+            #     query, words = single_words_entities(documento)
+            # else:
+            #     query, words = words_relacionadas(selected)
+            materiasSolr = relacionadas(doc=documento, comb='s', total=5)
             
             for (mSolr,v) in materiasSolr:
                 idMateria = re.search('(?<=[a-z]/)[0-9]+', mSolr.identifier).group(0)

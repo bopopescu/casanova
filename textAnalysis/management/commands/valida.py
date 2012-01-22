@@ -9,6 +9,9 @@ import re
 from textAnalysis.estrategia_consulta import *
 from textAnalysis.utils import *
 from textAnalysis.ner import *
+from optparse import make_option
+
+
 
 
 def remove_host(url):
@@ -32,36 +35,53 @@ def monta_doc(m):
     html = lhtml.fromstring(m.corpo.decode('utf-8'))
     documento['relacionadas'] = set([ change_host(h.attrib['href']).lower() for h in html.cssselect('.saibamais ul li a')])            
     return documento
+
             
 class Command(BaseCommand): 
+    option_list = BaseCommand.option_list + (
+        make_option('--sequential',
+            default='se',
+            help='features'),
+        make_option('--editoria',
+            default='',
+            help='editoria'),
+        make_option('--total',
+            default=100,
+            help='total'),
+        make_option('--recomendadas',
+            default=5,
+            help='materias recomendadas'),
+        )
     
     def handle(self, *args, **options):
-        total = 100
-        # materias = Materia.objects.filter(status='T')[:total]
         
-        folder = Folder.objects.get(name='Planeta Bizarro')
-        materias = Materia.objects.filter(status='T').exclude(folders=folder)[:total]
-        # materias = Materia.objects.filter(status='T', folders=folder)[:total]
-        
+        if options['editoria']:
+            folder = Folder.objects.get(name=options['editoria'])
+            materias = Materia.objects.filter(status='T', folders=folder)
+        else:
+            materias = Materia.objects.filter(status='T')
+            
+        materias = materias[:options['total']]
+
+        # editorias_id = [39,31,119,214,339,216,146,
+        #                 8,133,101,94,20,42,76,105]
+        # for f in editorias_id:
+        #     folder = Folder.objects.get(id=f)
+        #     materias = Materia.objects.filter(status='T', folders=folder)[:total]
+    
         contador = 0
 
         for m in materias:
             documento = monta_doc(m)
-
-            query, words = single_words_entities(documento)
-
-            # query, words = word_frequency(documento)
-            # query2, words2 = entidades(documento)
-            # query.extend(query2)
-
-            materiasSolr = relacionadas(documento, 5, query[0])
+            materiasSolr = relacionadas(documento, comb=options['sequential'], total=int(options['recomendadas']))
             recomendadas = []
             recomendadas = [str(recomendada.url) for (recomendada, score) in materiasSolr]
             encontradas = documento['relacionadas'].intersection(recomendadas)
             if any(encontradas):
                 contador +=1
-            
+    
             print contador
 
         print "acerto=>", contador*1.0/len(materias),contador, len(materias)
+
 

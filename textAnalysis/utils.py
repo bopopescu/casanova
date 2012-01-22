@@ -56,7 +56,6 @@ def clean(text, separador='.'):
     text = re.sub(r"[.,?:;!\|_+=)(*&\^/><@#%\]\}\[\{\"\'\~\`]", separador, text)
     text = re.sub(r"[\n\t\r]", r' ', text)
     text = re.sub(r"[\-]", r' ', text)
-    
     # text = re.sub(r"[0-9]", r' ', text)
     return text
 
@@ -76,7 +75,7 @@ def colocation(text,n, ini, fim):
         if vec2:
             vec1.append(vec2)
     return vec1
-    
+
 def normalize(text):
     if type(text) != unicode:
         try: 
@@ -86,11 +85,9 @@ def normalize(text):
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore")
     return text #.lower()
 
-
 def extrai_ngram(text,n=3):
     words = []
     text = clean(text)
-    
     for i in range(1,n+1):
         offset_ini_frase=0
         for frase in text.split("."):
@@ -108,16 +105,13 @@ def extrai_ngram(text,n=3):
             offset_ini_frase=offset_fim_frase+1
     return words
 
-
 def extract_text_from_p(html):
     if not html:
         return html
-    
     text = ""
     # contorno para resolver problema semantica
     html = re.sub(r'<a class="remover">x</a>', r'', html)
     html = re.sub(r'<br>', r' ', html)
-    
     html = lhtml.fromstring(html)
     for pdata in html.cssselect('p'):
         if pdata.text_content():
@@ -133,28 +127,21 @@ def entities():
     words =  [normalize(word.strip()) for word in words.split("\n") if not normalize(word) in stopwords() and normalize(word) and len(word.split())<=3]
     random.shuffle(words)
     return set(words) 
-    
-def bigrams(words, score_fn=BigramAssocMeasures.chi_sq, n=200):
-    bigram_finder = BigramCollocationFinder.from_words(words)
-    words = bigram_finder.ngram_fd.items()
-    return [word for word in words if is_valid_bigram(word)]
 
-def trigrams(words, score_fn=TrigramAssocMeasures.chi_sq, n=200):
-    trigram_finder = TrigramCollocationFinder.from_words(words)
-    words = trigram_finder.ngram_fd.items()
-    return [word for word in words if is_valid_trigram(word)]
-
-def tf(texto):
-    words = extrai_ngram(texto, n=3)
-    stop = stopwords()
-    tags={}
-    for (word,i,f) in words:
-        if word not in stop and not word.isdigit() and is_valid_ngram(word):
-            if tags.has_key(word):
-                tags[word]+=1
-            else:
-                tags[word]=1
-    return tags
+def sorted_dict_by_value(tags):
+    items = tags.items()
+    items.sort( key=lambda tags:(-tags[1],tags[0]) )
+    return items
+            
+# def bigrams(words, score_fn=BigramAssocMeasures.chi_sq, n=200):
+#     bigram_finder = BigramCollocationFinder.from_words(words)
+#     words = bigram_finder.ngram_fd.items()
+#     return [word for word in words if is_valid_bigram(word)]
+# 
+# def trigrams(words, score_fn=TrigramAssocMeasures.chi_sq, n=200):
+#     trigram_finder = TrigramCollocationFinder.from_words(words)
+#     words = trigram_finder.ngram_fd.items()
+#     return [word for word in words if is_valid_trigram(word)]
 
 def better_words(words):
     lista=[]
@@ -166,34 +153,41 @@ def better_words(words):
             if freq >= media and len(lista)<=10:
                 lista.append(word)
     return lista
+    
 
-    # dist={}
-    # for (word, freq) in words:
-    #     if dist.has_key(freq):
-    #         dist[freq]+=1
-    #     else:
-    #         dist[freq]=1
-    # 
-    # acum=0
-    # for (word, freq) in words:
-    #     acum+=freq*1.0/dist[freq]
-    #     if type(word)==tuple:
-    #         word=" ".join(word)
-    #     print word, freq, acum
-    #     lista.append([word])
-    #     if acum >=80 or len(lista)>10:
-    #         break
+def ngram_frequency(texto):
+    words = extrai_ngram(texto, n=3)
+    stop = stopwords()
+    tags={}
+    for (word,i,f) in words:
+        if word not in stop and not word.isdigit() and is_valid_ngram(word):
+            if tags.has_key(word):
+                tags[word]+=1
+            else:
+                tags[word]=1
+    words = sorted_dict_by_value(tags)
+    words = better_words(words) 
+    return words
+
+def unigram_frequency(texto):
+    text = clean(texto, separador=' ')
+    words = text.split()
+    stop = stopwords()
+    tags={}
+    for word in words:
+        if word not in stop and len(word)>2 and not word.isdigit():
+            if tags.has_key(word):
+                tags[word]+=1
+            else:
+                tags[word]=1
+    _unigrams = sorted_dict_by_value(tags)
+    _unigrams = better_words(_unigrams) 
+    return _unigrams
 
 
 def lema(word):
     lemmatizer = RSLPStemmer()    
     return "%s*" % lemmatizer.stem(word)
-    
-
-def sorted_dict_by_value(tags):
-    items = tags.items()
-    items.sort( key=lambda tags:(-tags[1],tags[0]) )
-    return items
 
 def all_words(words, w_dict):
     for word in words:
@@ -234,7 +228,6 @@ def jaccard(texto1, texto2):
     doc2 = set(texto2)
     docx = doc1.intersection(doc2)
     return float(len(docx)) / (len(doc1) + len(doc2) - len(docx))
-
 
 def is_valid_trigram(t):
     if (_tagger.tag([t[0][2]])[0][1]=='PCP' or _tagger.tag([t[0][0]])[0][1]=='PCP' ):
@@ -289,7 +282,6 @@ def is_valid_trigram(t):
         return False
     if (_tagger.tag([t[0][1]])[0][1]=='PCP'):
         return False
-    
     return True
 
 def is_valid_bigram(t):
@@ -335,9 +327,8 @@ def is_valid_bigram(t):
     #     return False
     if (_tagger.tag([t[0][1]])[0][1]=='PCP'):
         return False
-        
     return True
-    
+
 def is_valid_unigram(word):
     if  _tagger.tag([word])[0][1]=='V':
         return False
@@ -363,16 +354,13 @@ def is_valid_unigram(word):
         return False  
     if  len(_tagger.tag([word])[0][0])==1:
         return False
-        
     return True
-    
+
 def is_valid_ngram(word):
-    
     stops = ['pelo','pela','pelos','pelos','nesta','neste']
     for w in stops:
         if w in word:
             return False
-
     word = word.split()
     if len(word) == 3:
         return is_valid_trigram([word])
@@ -380,9 +368,8 @@ def is_valid_ngram(word):
         return is_valid_bigram([word])
     elif len(word) == 1:
         return is_valid_unigram(word[0])
-            
     return True
-    
+
 def saveClassifier(classifier, name='ClassificadorEntity.pkl'): 
     fModel = open(name,"wb") 
     pickle.dump(classifier, fModel,1) 
