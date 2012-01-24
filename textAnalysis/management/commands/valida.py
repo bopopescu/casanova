@@ -11,7 +11,7 @@ from textAnalysis.utils import *
 from textAnalysis.ner import *
 from optparse import make_option
 
-
+import itertools
 
 
 def remove_host(url):
@@ -31,8 +31,11 @@ def monta_doc(m):
     documento['subtitulo']=m.subtitulo
     documento['texto']=m.corpo
     documento['editorias'] = [editoria.folder for editoria in m.editorias()]
-    # documento['entidades'] = [entidade for entidade in m.cita.all()] 
     html = lhtml.fromstring(m.corpo.decode('utf-8'))
+    documento['html_tags'] = [ tag.text for tag in html.cssselect('p strong') if tag.text]
+    documento['html_tags'] += [ tag.text for tag in html.cssselect('p em') if tag.text]
+    documento['caption'] = [ tag.text for tag in html.cssselect('.foto strong') if tag.text]
+    documento['caption'] += [ tag.text for tag in html.cssselect('.video strong') if tag.text]
     documento['relacionadas'] = set([ change_host(h.attrib['href']).lower() for h in html.cssselect('.saibamais ul li a')])            
     return documento
 
@@ -51,6 +54,9 @@ class Command(BaseCommand):
         make_option('--recomendadas',
             default=5,
             help='materias recomendadas'),
+        make_option('--similaridade',
+            default=False,
+            help='similaridade'),
         )
     
     def handle(self, *args, **options):
@@ -70,18 +76,31 @@ class Command(BaseCommand):
         #     materias = Materia.objects.filter(status='T', folders=folder)[:total]
     
         contador = 0
+        combinacoes = []
+        dict_combinacoes = {}
+        seq = options['sequential']
+        for tam_comb in range(len(seq)):
+            for comb in itertools.combinations(seq,tam_comb+1):
+                combinacoes.append("".join(comb))
 
         for m in materias:
-            documento = monta_doc(m)
-            materiasSolr = relacionadas(documento, comb=options['sequential'], total=int(options['recomendadas']))
-            recomendadas = []
-            recomendadas = [str(recomendada.url) for (recomendada, score) in materiasSolr]
-            encontradas = documento['relacionadas'].intersection(recomendadas)
-            if any(encontradas):
-                contador +=1
-    
+            contador+=1
             print contador
-
-        print "acerto=>", contador*1.0/len(materias),contador, len(materias)
-
+            for comb in combinacoes: 
+                documento = monta_doc(m)
+                materiasSolr = relacionadas(documento, comb=comb, total=int(options['recomendadas']), similaridade=eval(options['similaridade']))
+                recomendadas = []
+                recomendadas = [str(recomendada.url) for (recomendada, score) in materiasSolr]
+                encontradas = documento['relacionadas'].intersection(recomendadas)
+                if any(encontradas):
+                    if dict_combinacoes.has_key(comb):
+                        dict_combinacoes[comb]+=1
+                    else:
+                        dict_combinacoes[comb]=1
+        
+        print "total de acertos em %s matérias" % (contador)
+        
+        for dc in dict_combinacoes.keys():
+            print dc,dict_combinacoes[dc]
+            
 

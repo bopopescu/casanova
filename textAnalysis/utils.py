@@ -154,9 +154,8 @@ def better_words(words):
                 lista.append(word)
     return lista
     
-
-def ngram_frequency(texto):
-    words = extrai_ngram(texto, n=3)
+def ngram_frequency(texto, n=3):
+    words = extrai_ngram(texto, n=n)
     stop = stopwords()
     tags={}
     for (word,i,f) in words:
@@ -169,22 +168,6 @@ def ngram_frequency(texto):
     words = better_words(words) 
     return words
 
-def unigram_frequency(texto):
-    text = clean(texto, separador=' ')
-    words = text.split()
-    stop = stopwords()
-    tags={}
-    for word in words:
-        if word not in stop and len(word)>2 and not word.isdigit():
-            if tags.has_key(word):
-                tags[word]+=1
-            else:
-                tags[word]=1
-    _unigrams = sorted_dict_by_value(tags)
-    _unigrams = better_words(_unigrams) 
-    return _unigrams
-
-
 def lema(word):
     lemmatizer = RSLPStemmer()    
     return "%s*" % lemmatizer.stem(word)
@@ -192,9 +175,9 @@ def lema(word):
 def all_words(words, w_dict):
     for word in words:
         if w_dict.has_key(word):
-            w_dict[word]+=words[word]
+            w_dict[word]+=1
         else:
-            w_dict[word]=words[word]
+            w_dict[word]=1
     return w_dict
 
 def doc_vec(doc,key_idx):
@@ -207,8 +190,8 @@ def doc_vec(doc,key_idx):
 
 def VSM(texto1, texto2):
     tags={}
-    doc1 = tf(texto1)
-    doc2 = tf(texto2)
+    doc1 = [w for (w,s,e) in extrai_ngram(texto1,n=1)]
+    doc2 = [w for (w,s,e) in extrai_ngram(texto2,n=1)]
     tags = all_words(doc1, tags)
     tags = all_words(doc2, tags)
     key_idx=dict()

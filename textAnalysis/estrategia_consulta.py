@@ -34,6 +34,8 @@ class Estrategia:
 def querySolr(words, editorias, total=50):
     materias = []
     solr_connection = SolrConnection(settings.SOLRSERVER)
+    if not words:
+        return materias
     query = [' OR '.join('(%s)' % tag for tag in words)]
     if editorias:
         query = ['((%s) %s)' % (query[0], editorias)]
@@ -61,10 +63,25 @@ def _editorias(doc):
     return queries
 
 
-def single_words_entities(doc, editorias=True):
-    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
+def b_ngram_freq(doc):
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))    
+    return ngram_frequency(text,n=2)
+
+def t_ngram_freq(doc):
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))    
+    return ngram_frequency(text,n=3)
+
+def caption(doc):
+    text = "%s." % (doc['caption'])    
+    return ngram_frequency(text)
+
+def html_tags(doc):
+    text = "%s." % (doc['html_tags'])    
+    return ngram_frequency(text)
+     
+def u_ngram_freq(doc):
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))    
     text = clean(text, separador=' ')
-    q_editorias = _editorias(doc)
     words = text.split()
     stop = stopwords()
     tags={}
@@ -74,43 +91,25 @@ def single_words_entities(doc, editorias=True):
                 tags[word]+=1
             else:
                 tags[word]=1
-
     _unigrams = sorted_dict_by_value(tags)
     _unigrams = better_words(_unigrams) 
-    words = _unigrams 
+    return _unigrams
 
+def my_entities(doc):
     text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
-    entities = my_fastercts(text)
-
-    # [it for it in itertools.combinations('ABCD',3)]
-
-    # Aumento de 43% para 59%
-    
-    # print words
-    
-    for ent in entities:
-        if ent not in words:
-            words.append(ent)
-            
-    # print entities
-    
-    query = [' OR '.join('(%s)' % tag for tag in words)]
-    
-    if q_editorias:
-        query = ['((%s) %s)' % (query[0], q_editorias)]
-    
-    return query, words
-
-
+    return my_fastercts(text)
 
 features = {
-  's': unigram_frequency,
-  # 'h': ngram_frequency,
-  # 'c': my_fastercts,
-  'e': my_fastercts,
+  't': t_ngram_freq,
+  'b': b_ngram_freq,
+  'u': u_ngram_freq,
+  'h': html_tags,
+  'c': caption,
+  'e': my_entities,
 }
 
-def _combina(comb, text):
+def _combina(comb, doc):
+    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
     words = []
     if comb:
     	for c in comb:
@@ -118,33 +117,30 @@ def _combina(comb, text):
     			raise NotImplementedError('%s is not a valid sequential backoff tagger' % c)
 
     		constructor = features[c]
-    		_words = constructor(text)
+    		_words = constructor(doc)
+            # print _words
     		for word in _words:
     		    if word not in words:
     		        words.append(word)
     
     return words
 
-def relacionadas(doc, comb='s' ,total=5):
-    text = "%s. %s. %s" % (doc['titulo'],doc['subtitulo'], extract_text_from_p(doc['texto']))
-    words = _combina(comb,text)
-    # q, words = single_words_entities(doc, editorias=True)
+def relacionadas(doc, comb='s',total=5, similaridade=False):
     materias = []
+    words = _combina(comb,doc)
     editorias = _editorias(doc)
     materiasSolr = querySolr(words, editorias, total=50)
     for materiaSolr in materiasSolr:
         mSolr = MateriaDoSolr(materiaSolr)
         peso = materiaSolr['score']
-        # idMateria = re.search('(?<=[a-z]/)[0-9]+', materia.identifier).group(0)
         try:
-            # m = Materia.objects.get(id = idMateria)
             # remove a propria materia da lista 
             if doc['titulo'] != mSolr.title:
                 # nao coloca materias duplicadas na lista
                 if not any([m.title == mSolr.title for (m,vsm) in materias]):
                     vsm = 1
-                    # vsm = VSM(doc['titulo'], mSolr.title)*10
-                    # vsm = VSM(extract_text_from_p(doc['texto']), extract_text_from_p(mSolr.body))*10
+                    if similaridade: 
+                        vsm = VSM(extract_text_from_p(doc['texto']), extract_text_from_p(mSolr.body))
                     score = vsm*peso
                     materias += [(mSolr,score)]
         except:
