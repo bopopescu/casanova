@@ -130,3 +130,5 @@ class Command(BaseCommand):
         for f in sorted(dict_final.keys()):
             print f, dict_final[f]
         
+        print time.time() -inicio
+        

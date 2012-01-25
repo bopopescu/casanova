@@ -3,10 +3,12 @@ from django.conf import settings
 from textAnalysis.utils import *
 import itertools
 import datetime
-
 from globocore.materia.models import Materia
 from textAnalysis.materia_do_solr import MateriaDoSolr 
 from textAnalysis.ner import *  
+
+from textAnalysis.cache import *
+cache = CachedDict()
 
 
 def periodo(doc, time=2000):
@@ -116,7 +118,13 @@ def _combina(comb, doc):
     		if c not in features:
     			raise NotImplementedError('%s is not a valid sequential backoff tagger' % c)
     		constructor = features[c]
-    		_words = constructor(doc)
+    		chave = "%s_%s" % (c, doc['permalink'])
+    		if cache.get(chave):
+    		    _words = cache.get(chave)
+    		else:
+    		    _words = constructor(doc)
+    		    cache.set(chave,_words)
+
     		for word in _words:
     		    if word not in words:
     		        words.append(word)
@@ -127,7 +135,7 @@ def relacionadas(doc, comb='s',total=5, similaridade=False):
     materias = []
     words = _combina(comb,doc)
     editorias = _editorias(doc)
-    materiasSolr = querySolr(words, editorias, total=50)
+    materiasSolr = querySolr(words, editorias, total=25)
     for materiaSolr in materiasSolr:
         mSolr = MateriaDoSolr(materiaSolr)
         peso = materiaSolr['score']
@@ -137,8 +145,14 @@ def relacionadas(doc, comb='s',total=5, similaridade=False):
                 # nao coloca materias duplicadas na lista
                 if not any([m.title == mSolr.title for (m,vsm) in materias]):
                     vsm = 1
-                    if similaridade: 
-                        vsm = VSM(extract_text_from_p(doc['texto']), extract_text_from_p(mSolr.body))
+                    if similaridade:
+                        chave = "%s_%s" % (doc['permalink'], mSolr.identifier)
+                        if cache.get(chave):
+                            vsm = cache.get(chave)
+                        else:
+                            vsm = VSM(extract_text_from_p(doc['texto']), extract_text_from_p(mSolr.body))
+                            cache.set(chave, vsm)
+                    
                     score = vsm*peso
                     materias += [(mSolr,score)]
         except:
