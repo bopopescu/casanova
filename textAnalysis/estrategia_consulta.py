@@ -115,10 +115,8 @@ def _combina(comb, doc):
     	for c in comb:
     		if c not in features:
     			raise NotImplementedError('%s is not a valid sequential backoff tagger' % c)
-
     		constructor = features[c]
     		_words = constructor(doc)
-            # print _words
     		for word in _words:
     		    if word not in words:
     		        words.append(word)

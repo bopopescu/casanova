@@ -124,7 +124,6 @@ def my_fastercts(text):
     words = extrai_ngram(text)
     words = [(word,i,f) for (word,i,f) in words if is_entity(word) and is_valid_ngram(word)]
     words = sorted(words, key=lambda s: len(s[0].split()), reverse=True)
-    # print words
     ws=[]
     if words:
         ws = [words[0]] 

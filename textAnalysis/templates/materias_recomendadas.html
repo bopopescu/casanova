@@ -15,6 +15,15 @@ function SuggestSaibaMais() {
         $('.editoria input[type=hidden]').each(function(){
             editorias.push($(this).val());
         })
+		var array_values = [];
+		$('input[type=checkbox]').each(   function() {
+		    if( $(this).is(':checked') ) {
+
+		       array_values.push($(this).val());
+		    }
+		});
+
+		var arrayValues = array_values.join('');
         params = {'texto' : corpo, 
                  'titulo' : titulo, 
                  'subtitulo' : subtitulo,
@@ -22,7 +31,7 @@ function SuggestSaibaMais() {
                  'entidades' : entidades.join(),
                  'colaborador' : colaborador,
                  'editorias' : editorias.join(),
-				 'criterio': $('#criterio').val(), }
+				 'criterio': arrayValues, }
              
     } else {
         params = {}
@@ -49,6 +58,15 @@ function SuggestSaibaMais() {
 	<select id="criterio">
 		<option value="todos">todos</option>
 	</select> -->
+	
+	<input type="checkbox" style='width:20px;' id="criterio1" value="u"> Unigrams<br>
+	<input type="checkbox" style='width:20px;' id="criterio2" value="b"> Bigrams<br>
+	<input type="checkbox" style='width:20px;' id="criterio3" value="t"> Trigrams<br>
+	<input type="checkbox" style='width:20px;' id="criterio4" value="h"> Html Tags<br>
+	<input type="checkbox" style='width:20px;' id="criterio5" value="c"> Captions<br>
+	<input type="checkbox" style='width:20px;' id="criterio6" value="e"> Entidades<br>
+	
+	
 	<input type="button" value="Recomendar" onclick="javascript:SuggestSaibaMais()"/>
 	<div id="materias_relacionadas"></div>
 </div>

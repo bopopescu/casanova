@@ -34,9 +34,9 @@ def forced_entity(word):
 def features(word): 
     features = {}
     classe = "+".join([(_tagger.tag([w])[0][1]) for w in word.split()])
-    features['Classe'] = classe
-    features["PrimeiraLetra"] = word.split()[0][0]    
-    features["TotaldePalavras"] = len(word.split())
+    features['classe'] = classe
+    features["firstletter"] = word.split()[0][0]    
+    features["total2"] = len(word.split())
     return features
 
                     

@@ -51,6 +51,13 @@ def extrair_dados_do_form(request):
                 pass
     if request.POST.get('permalink'):
         documento['permalink'] = request.POST.get('permalink')
+    
+    html = lhtml.fromstring(documento['texto'].decode('utf-8'))
+    documento['html_tags'] = [ tag.text for tag in html.cssselect('p strong') if tag.text]
+    documento['html_tags'] += [ tag.text for tag in html.cssselect('p em') if tag.text]
+    documento['caption'] = [ tag.text for tag in html.cssselect('.foto strong') if tag.text]
+    documento['caption'] += [ tag.text for tag in html.cssselect('.video strong') if tag.text]
+        
     return documento if documento['titulo'] else []
 
 def classify(request):
@@ -60,12 +67,8 @@ def classify(request):
     try:
         documento = extrair_dados_do_form(request) 
         if documento:
-            # selected = request.POST.get('criterio') if request.POST.get('criterio') else 'todos'
-            # if selected == 'todos':
-            #     query, words = single_words_entities(documento)
-            # else:
-            #     query, words = words_relacionadas(selected)
-            materiasSolr = relacionadas(doc=documento, comb='s', total=5)
+            comb = request.POST.get('criterio') if request.POST.get('criterio') else 'u'
+            materiasSolr = relacionadas(doc=documento, comb=comb, total=5)
             
             for (mSolr,v) in materiasSolr:
                 idMateria = re.search('(?<=[a-z]/)[0-9]+', mSolr.identifier).group(0)

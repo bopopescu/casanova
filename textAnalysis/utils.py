@@ -15,7 +15,7 @@ import pickle
 import random
 
 # python train__tagger.py mac_morpho --sequential au --fraction 0.8 --filename macmorpo_sed__tagger.pickle
-# removendo acentuacao e letras maiusculas
+# removendo acentuacao
 # 51397 tagged sents, training on 41118
 # training AffixTagger with affix -3 and backoff <DefaultTagger: tag=-None->
 # training <class 'nltk.tag.sequential.UnigramTagger'> _tagger with backoff <AffixTagger: size=6218>
@@ -159,11 +159,12 @@ def ngram_frequency(texto, n=3):
     stop = stopwords()
     tags={}
     for (word,i,f) in words:
-        if word not in stop and not word.isdigit() and is_valid_ngram(word):
-            if tags.has_key(word):
-                tags[word]+=1
-            else:
-                tags[word]=1
+        if len(word.split()) == n:
+            if word not in stop and not word.isdigit() and is_valid_ngram(word):
+                if tags.has_key(word):
+                    tags[word]+=1
+                else:
+                    tags[word]=1
     words = sorted_dict_by_value(tags)
     words = better_words(words) 
     return words

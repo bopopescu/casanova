@@ -60,6 +60,8 @@ class Command(BaseCommand):
         )
     
     def handle(self, *args, **options):
+        import time
+        inicio = time.time()
         
         if options['editoria']:
             folder = Folder.objects.get(name=options['editoria'])
@@ -83,24 +85,48 @@ class Command(BaseCommand):
             for comb in itertools.combinations(seq,tam_comb+1):
                 combinacoes.append("".join(comb))
 
+
         for m in materias:
             contador+=1
-            print contador
+            print contador, time.time() -inicio
+
+            mfolder = m.primary_folder().name
+            if not dict_combinacoes.has_key(mfolder):
+                dict_combinacoes[mfolder] = {}
+            
+            if dict_combinacoes[mfolder].has_key('_TotalMaterias'):
+                dict_combinacoes[mfolder]['_TotalMaterias'] +=1 
+            else:
+                dict_combinacoes[mfolder]['_TotalMaterias']=1
+                
             for comb in combinacoes: 
                 documento = monta_doc(m)
                 materiasSolr = relacionadas(documento, comb=comb, total=int(options['recomendadas']), similaridade=eval(options['similaridade']))
                 recomendadas = []
                 recomendadas = [str(recomendada.url) for (recomendada, score) in materiasSolr]
                 encontradas = documento['relacionadas'].intersection(recomendadas)
+
                 if any(encontradas):
-                    if dict_combinacoes.has_key(comb):
-                        dict_combinacoes[comb]+=1
+                    if dict_combinacoes[mfolder].has_key(comb):
+                        dict_combinacoes[mfolder][comb]+=1
                     else:
-                        dict_combinacoes[comb]=1
+                        dict_combinacoes[mfolder][comb]=1
+
         
-        print "total de acertos em %s matérias" % (contador)
+        # print "total de acertos em %s matérias" % (contador)
+        
+        dict_final={}
         
         for dc in dict_combinacoes.keys():
-            print dc,dict_combinacoes[dc]
+            print "\n", dc
+            for d in sorted(dict_combinacoes[dc].keys()):
+                print d,dict_combinacoes[dc][d]                
+                if dict_final.has_key(d):
+                    dict_final[d]+=dict_combinacoes[dc][d]
+                else:
+                    dict_final[d]=dict_combinacoes[dc][d]
             
-
+        print "\nTotal Geral"
+        for f in sorted(dict_final.keys()):
+            print f, dict_final[f]
+        
