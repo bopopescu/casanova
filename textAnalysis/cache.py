@@ -1,3 +1,5 @@
+from django.conf import settings
+
 class CachedItem(object):
     def __init__(self, key, value):
         self.key = key
@@ -14,4 +16,5 @@ class CachedDict(dict):
         return self[key].value
         
     def set(self, key, value):
-        self[key] = CachedItem(key, value)
+        if settings.CACHE:
+            self[key] = CachedItem(key, value)

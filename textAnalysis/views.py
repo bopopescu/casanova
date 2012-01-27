@@ -26,7 +26,8 @@ def extrair_dados_do_form(request):
         'permalink':'',
         'editorias':[],
         'entidades':[],
-        'bold_text':[],
+        'html_tags':[],
+        'caption':[],
     }
     if request.POST.get('titulo'):
         documento['titulo']=request.POST.get('titulo')
@@ -34,15 +35,6 @@ def extrair_dados_do_form(request):
         documento['subtitulo']=request.POST.get('subtitulo')
     if request.POST.get('texto'):
         documento['texto']=request.POST.get('texto')
-        html = lhtml.fromstring(documento['texto'].decode('utf-8'))
-        documento['bold_text'] = [ h.text_content().strip() for h in html.cssselect('p strong')]
-    if request.POST.get('entidades'):
-        for entidade_id in request.POST.get('entidades').split(","):
-            try:
-                # documento['entidades'].append(Entidade.objects.get(id=entidade_id))
-                pass
-            except:
-                pass
     if request.POST.get('editorias'):
         for editoria_id in request.POST.get('editorias').split(","):
             try:
@@ -52,12 +44,12 @@ def extrair_dados_do_form(request):
     if request.POST.get('permalink'):
         documento['permalink'] = request.POST.get('permalink')
     
-    html = lhtml.fromstring(documento['texto'].decode('utf-8'))
+    html = lhtml.fromstring(documento['texto'])
     documento['html_tags'] = [ tag.text for tag in html.cssselect('p strong') if tag.text]
     documento['html_tags'] += [ tag.text for tag in html.cssselect('p em') if tag.text]
     documento['caption'] = [ tag.text for tag in html.cssselect('.foto strong') if tag.text]
     documento['caption'] += [ tag.text for tag in html.cssselect('.video strong') if tag.text]
-        
+            
     return documento if documento['titulo'] else []
 
 def classify(request):

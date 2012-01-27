@@ -74,11 +74,11 @@ def t_ngram_freq(doc):
     return ngram_frequency(text,n=3)
 
 def caption(doc):
-    text = "%s." % (doc['caption'])    
+    text = ".".join(doc['caption'])    
     return ngram_frequency(text)
 
 def html_tags(doc):
-    text = "%s." % (doc['html_tags'])    
+    text = ".".join(doc['html_tags'])   
     return ngram_frequency(text)
      
 def u_ngram_freq(doc):
@@ -124,14 +124,14 @@ def _combina(comb, doc):
     		else:
     		    _words = constructor(doc)
     		    cache.set(chave,_words)
-
+            # print _words
     		for word in _words:
     		    if word not in words:
     		        words.append(word)
     
     return words
 
-def relacionadas(doc, comb='s',total=5, similaridade=False):
+def relacionadas(doc, comb='s',total=5, similaridade=True):
     materias = []
     words = _combina(comb,doc)
     editorias = _editorias(doc)

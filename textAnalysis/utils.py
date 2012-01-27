@@ -49,7 +49,7 @@ def unescape(text):
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
 
-def clean(text, separador='.'): 
+def clean(text, separador='.'):
     text = clean_html(text)
     text = unescape(text)
     text = normalize(text)
@@ -91,18 +91,19 @@ def extrai_ngram(text,n=3):
     for i in range(1,n+1):
         offset_ini_frase=0
         for frase in text.split("."):
-            offset_fim_frase=offset_ini_frase + len(frase)
-            ngrams = colocation(frase,i,offset_ini_frase,offset_fim_frase)
-            for ngram in ngrams:
-                word = ""
-                ini = 999999
-                fim = 0
-                for (w,s,e) in ngram:
-                    word += w if not word else " %s" % w
-                    ini = s if ini > s else ini 
-                    fim = e if fim < e else fim
-                words.append((word,ini,fim))
-            offset_ini_frase=offset_fim_frase+1
+            if frase.strip():
+                offset_fim_frase=offset_ini_frase + len(frase)
+                ngrams = colocation(frase,i,offset_ini_frase,offset_fim_frase)
+                for ngram in ngrams:
+                    word = ""
+                    ini = 999999
+                    fim = 0
+                    for (w,s,e) in ngram:
+                        word += w if not word else " %s" % w
+                        ini = s if ini > s else ini 
+                        fim = e if fim < e else fim
+                    words.append((word,ini,fim))
+                offset_ini_frase=offset_fim_frase+1
     return words
 
 def extract_text_from_p(html):
@@ -132,16 +133,6 @@ def sorted_dict_by_value(tags):
     items = tags.items()
     items.sort( key=lambda tags:(-tags[1],tags[0]) )
     return items
-            
-# def bigrams(words, score_fn=BigramAssocMeasures.chi_sq, n=200):
-#     bigram_finder = BigramCollocationFinder.from_words(words)
-#     words = bigram_finder.ngram_fd.items()
-#     return [word for word in words if is_valid_bigram(word)]
-# 
-# def trigrams(words, score_fn=TrigramAssocMeasures.chi_sq, n=200):
-#     trigram_finder = TrigramCollocationFinder.from_words(words)
-#     words = trigram_finder.ngram_fd.items()
-#     return [word for word in words if is_valid_trigram(word)]
 
 def better_words(words):
     lista=[]

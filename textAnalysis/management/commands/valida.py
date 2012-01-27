@@ -10,7 +10,7 @@ from textAnalysis.estrategia_consulta import *
 from textAnalysis.utils import *
 from textAnalysis.ner import *
 from optparse import make_option
-
+from django.conf import settings
 import itertools
 
 
@@ -62,6 +62,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         import time
         inicio = time.time()
+        
+        settings.CACHE = True
         
         if options['editoria']:
             folder = Folder.objects.get(name=options['editoria'])
