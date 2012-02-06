@@ -39,7 +39,7 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         documento = {}
-        datainicio = datetime.datetime(day=1,month=9,year=2011)
+        datainicio = datetime.datetime(day=1,month=1,year=2011)
         # datafim = datetime.datetime(day=30,month=10,year=2011)
         
         editorias = ['Brasil','São Paulo','Rio de Janeiro','Minas Gerais',
@@ -73,11 +73,11 @@ class Command(BaseCommand):
         #     
         # print len(Materia.objects.filter(status='T'))
                     
-        total_editoria = 96
+        total_editoria = 300
         sair = False
-        if len(Materia.objects.filter(status='T')) >= 1440:
-            print "já chegamos no limite"
-            return
+        # if len(Materia.objects.filter(status='T')) >= 1440:
+        #     print "já chegamos no limite"
+        #     return
             
         for editoria in editorias_id:
             folder = Folder.objects.get(id=editoria)

@@ -5,14 +5,21 @@ import logging
 from django.conf import settings
 import urllib, simplejson
 from textAnalysis.utils import * 
-from textAnalysis.management.commands import trainclassifier
+from textAnalysis.management.commands import trainclassifier, newclassifier
 
 _entities = entities()
 classificador = loadClassifier()
+classificador2 = loadClassifier("classificador_texto")
+
 def is_entity(tag):
     features = trainclassifier.features(tag)
     # print features, tag,  classificador.prob_classify(features).prob('sim')
     return True if classificador.prob_classify(features).prob('sim') > 0.80 else False    
+
+def is_entity2(frase, tag):
+    features = newclassifier.features(frase,tag)
+    # print tag,  classificador.prob_classify(features).prob('sim')
+    return True if classificador2.prob_classify(features).prob('sim') > 0.80 else False    
 
 
 class HttpManeirao(object):
@@ -124,21 +131,49 @@ def my_fastercts(text):
     words = extrai_ngram(text)
     words = [(word,i,f) for (word,i,f) in words if is_entity(word) and is_valid_ngram(word)]
     words = sorted(words, key=lambda s: len(s[0].split()), reverse=True)
-    ws=[]
-    if words:
-        ws = [words[0]] 
-        inside = False
+
+    # ws=[]
+    # if words:
+    #     ws = [words[0]] 
+    #     inside = False
+    # 
+    # for (word,i,f) in words:
+    #     inside = False
+    #     for (w,s,e) in ws:
+    #         if word in w:
+    #             if (i>=s and f<=e) or word==w:
+    #                 inside = True
+    #                 break
+    #     if not inside:
+    #         ws.append((word,i,f))    
+
+    return [w for w,i,f in words]
+
     
-    for (word,i,f) in words:
-        inside = False
-        for (w,s,e) in ws:
-            if word in w:
-                if (i>=s and f<=e) or word==w:
-                    inside = True
-                    break
-        if not inside:
-            ws.append((word,i,f))    
-    return [w for w,i,f in ws]
+def my_fastercts2(text):
+    words = []
+    words = extrai_ngram(text)
+    sentenca =  " ".join(clean(text).split())
+    words = [(word,i,f) for (word,i,f) in words if is_entity2(sentenca,word) and is_valid_ngram(word)]
+    words = sorted(words, key=lambda s: len(s[0].split()), reverse=True)
+    
+    # ws=[]
+    # if words:
+    #     ws = [words[0]] 
+    #     inside = False
+    # 
+    # for (word,i,f) in words:
+    #     inside = False
+    #     for (w,s,e) in ws:
+    #         if word in w:
+    #             if (i>=s and f<=e) or word==w:
+    #                 inside = True
+    #                 break
+    #     if not inside:
+    #         ws.append((word,i,f))    
+
+    return [w for w,i,f in words]
+
 
 class NER(object):
     def __init__(self, func=None):

@@ -35,7 +35,7 @@ def features(word):
     features = {}
     classe = "+".join([(_tagger.tag([w])[0][1]) for w in word.split()])
     features['classe'] = classe
-    features["firstletter"] = word.split()[0][0]    
+    features["firstletter"] = 'UC' if word.split()[0][0].isupper() else 'LC'
     features["total2"] = len(word.split())
     return features
 
@@ -44,7 +44,7 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
 
-        materias = Materia.objects.filter(status='T')[:2000]
+        materias = Materia.objects.filter(status='T')[:1000]
         words = []
         
         for materia in materias:
@@ -53,13 +53,16 @@ class Command(BaseCommand):
         
         words = [word for (word,i,f) in words if is_valid_ngram(word)]
             
+        shuffle(words)
+        
         featuresets = [(features(word), 'sim' if word in _entities else 'nao') for word in words[:len(_entities)]]
         
         # aprende a identificar assuntos
         # forced_words = [word for word in words if forced_entity(word)]
         # featuresets += [(features(word), 'sim') for word in forced_words[:len(_entities)] if is_valid_ngram(word)]
         
-        featuresets += [(features(word), 'sim') for word in _entities if is_valid_ngram(word)]
+        
+        featuresets += [(features(word), 'sim') for word in _entities]
         
         random.shuffle(featuresets)
         
@@ -69,7 +72,7 @@ class Command(BaseCommand):
         print 'accuracy: ', nltk.classify.util.accuracy(classificador, test_set)
         print classificador.show_most_informative_features(20)
         
-        saveClassifier(classificador)
+        # saveClassifier(classificador)
 
         # print classificador.prob_classify(time_features(times[0][0])).prob('Entidade')
 
