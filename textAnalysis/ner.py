@@ -9,7 +9,7 @@ from textAnalysis.management.commands import trainclassifier, newclassifier
 
 _entities = entities()
 classificador = loadClassifier()
-classificador2 = loadClassifier("classificador_texto")
+# classificador2 = loadClassifier("classificador_texto")
 
 def is_entity(tag):
     features = trainclassifier.features(tag)

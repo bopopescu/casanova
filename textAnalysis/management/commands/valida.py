@@ -20,6 +20,7 @@ def remove_host(url):
                     url)
 
 def change_host(url):
+    return url
     return re.sub('http://g1.globo.com',
                     settings.BASE_URL,
                     url)
@@ -65,13 +66,15 @@ class Command(BaseCommand):
         
         settings.CACHE = True
         
-        if options['editoria']:
-            folder = Folder.objects.get(name=options['editoria'])
-            materias = Materia.objects.filter(status='T', folders=folder)
-        else:
-            materias = Materia.objects.filter(status='T')
+        # if options['editoria']:
+        #     folder = Folder.objects.get(name=options['editoria'])
+        #     materias = Materia.objects.filter(status='T', folders=folder)
+        # else:
+        #     materias = Materia.objects.filter(status='T')
             
-        materias = materias[:options['total']]
+        # materias = materias[:options['total']]
+
+        materias = Materia.objects.filter(corpo__icontains='saibamais')[:100]
 
         # editorias_id = [39,31,119,214,339,216,146,
         #                 8,133,101,94,20,42,76,105]
@@ -90,7 +93,7 @@ class Command(BaseCommand):
 
         for m in materias:
             contador+=1
-            print contador, time.time() -inicio
+            # print contador, time.time() -inicio
 
             mfolder = m.primary_folder().name
             if not dict_combinacoes.has_key(mfolder):
@@ -103,6 +106,9 @@ class Command(BaseCommand):
                 
             for comb in combinacoes: 
                 documento = monta_doc(m)
+                # import pdb; pdb.set_trace();
+
+
                 materiasSolr = relacionadas(documento, comb=comb, total=int(options['recomendadas']), similaridade=eval(options['similaridade']))
                 recomendadas = []
                 recomendadas = [str(recomendada.url) for (recomendada, score) in materiasSolr]
@@ -119,6 +125,8 @@ class Command(BaseCommand):
         
         dict_final={}
         
+        # import pdb; pdb.set_trace();
+
         for dc in dict_combinacoes.keys():
             print "\n", dc
             for d in sorted(dict_combinacoes[dc].keys()):
@@ -132,5 +140,5 @@ class Command(BaseCommand):
         for f in sorted(dict_final.keys()):
             print f, dict_final[f]
         
-        print time.time() -inicio
+        # print time.time() -inicio
         

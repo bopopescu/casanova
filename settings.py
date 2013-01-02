@@ -1,4 +1,5 @@
-# Django settings for TextAnalysis project.
+# -*- coding: utf-8 -*-
+
 from os.path import join, dirname, abspath, exists
 
 DEBUG = True
@@ -7,17 +8,51 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
+LOCAL = True
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql'
-DATABASE_NAME = 'glb_vinagrette'
-DATABASE_USER = 'root'
-DATABASE_PASSWORD = ''
-DATABASE_HOST = ''
-DATABASE_PORT = ''
+DATABASES = {
+'default': {
+    'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+    'NAME': 'g1',                      # Or path to database file if using sqlite3.
+    'USER': 'u_g1',                      # Not used with sqlite3.
+    'PASSWORD': 'u_g1',                  # Not used with sqlite3.
+    'HOST': 'publicacao.staging.mysql.globoi.com',                      # Set to empty string for localhost. Not used with sqlite3.
+    'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+}
+}
 
 LOCAL_FILE = lambda *x: abspath(join(dirname(__file__), *x))
+
+SERVER_NAME = '127.0.0.1'
+
+BASE_URL = "http://%s:8000" % SERVER_NAME
+
+#Url de backend
+BASE_BE_URL = BASE_URL
+STATIC_URL = '/static/'
+PUBLISHING_STATIC_PATH = LOCAL_FILE('editoria')
+
+STATIC_FLASH_PATH = LOCAL_FILE('flash')
+PHOTO_STATIC_PATH = LOCAL_FILE('fotos')
+STATIC_PHOTOS_URL = LOCAL_FILE('fotos')
+
+BROKER = 'stomp://%s:61613/' % SERVER_NAME
+#BROKER = 'tcp://riovld87.globoi.com:61616?wireformat=openwire'
+
+#Solr que processa as notificaes
+# SOLRSERVER = 'http://%s:8983/solr' % SERVER_NAME #'http://solr.portal.qa01.globoi.com/solr'
+SOLRSERVER = 'http://solr.portal.globoi.com/solr'
+
+# URL da fast usada para gera dos feeds de noticia/foto/video usados na
+# edi de homegit
+#FAST_URL = "http://jornalismo1.glb.com:15100"
+#FAST_URL = "http://fastqr.dev.globoi.com:15100"
+# FAST_URL = "http://cms.plataformas.glb.com:15100"
+
+# 159  PHOTO_URL_PATH = '/photo_static/'
+# 160  PHOTO_ALLOWED_TYPES = ['jpeg', 'jpg', 'gif', 'png']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -46,11 +81,44 @@ USE_L10N = True
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = LOCAL_FILE('media')
 
-
+PHOTO_URL_PATH = '/photo_static/'
+FLASH_URL_PATH = '/media/flash'
+PUBLISHING_URL_PATH = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = ''
+PORTAL = 'core'
+
+#Nome do portal usado como Token da Fast
+PORTAL_TOKEN_FAST = 'core'
+
+#Titulo no portal usado nos Titles das páginas
+PORTAL_TITLE = 'core'
+
+#uuid do root folder do seu projeto
+ROOT_ID = '55729699-b9c0-4052-8ad3-16bd0cb52b32'
+
+#Nome de publisher usado na indexação do solr
+PORTAL_SOLR_PUBLISHER = 'globocore'
+
+
+#Universo de conteúdo de acordo com a barra da Globo.com. Usado no solr e fast.
+MACROTEMA = 'Noticias'
+
+#Nome da coleção na Fast
+FAST_COLLECTION = ''
+
+#Nome da visao na Fast
+FAST_VIEW = 'coresppublished'
+
+#Campo da Fast usado no filtro de navegadores/busca
+FAST_FIELD_GALERIA = 'subeditorias'
+FAST_FIELD_MATERIA = 'subeditorias'
+FAST_FIELD_VIDEO = 'programa'
+
+#Local dos arquivos 'copia' do vignette usadaos em widgets para display local
+VIGNETTE_FILES = LOCAL_FILE('templates', PORTAL, 'delivery')
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -75,7 +143,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'TextAnalysis.urls'
+ROOT_URLCONF = 'urls'
 
 import os
 WEBSITE_DIR = os.path.dirname(__file__)
@@ -83,7 +151,7 @@ WEBSITE_DIR = os.path.dirname(__file__)
 PROJECT_ROOT = os.path.abspath(WEBSITE_DIR)
 TEMPLATE_DIRS = (
     '%s/globocore/materia/templates' % PROJECT_ROOT,
-    '%s/textClassification/templates' % PROJECT_ROOT,
+    '%s/textAnalysis/templates' % PROJECT_ROOT,
     
 )
 
@@ -94,9 +162,12 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
-    'testutils',
-    'textClassification',
+    # 'testutils',
+    'textAnalysis',
     'textSimilarity',
+    'globocore',
+    # 'globocore.estrutura',
+    # 'globocore.materia',
     # Uncomment the next line to enable the admin:
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',

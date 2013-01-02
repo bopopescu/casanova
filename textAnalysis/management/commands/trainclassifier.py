@@ -43,8 +43,9 @@ def features(word):
 class Command(BaseCommand): 
     
     def handle(self, *args, **options):
-
-        materias = Materia.objects.filter(status='T')[:1000]
+        # import pdb; pdb.set_trace();
+        # materias = Materia.objects.filter(status='T')[:1000]
+        materias = Materia.objects.all()[:1000]
         words = []
         
         for materia in materias:
@@ -72,7 +73,7 @@ class Command(BaseCommand):
         print 'accuracy: ', nltk.classify.util.accuracy(classificador, test_set)
         print classificador.show_most_informative_features(20)
         
-        # saveClassifier(classificador)
+        saveClassifier(classificador)
 
         # print classificador.prob_classify(time_features(times[0][0])).prob('Entidade')
 

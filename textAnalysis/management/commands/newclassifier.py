@@ -7,7 +7,6 @@ import nltk
 from textAnalysis.utils import *
 # import random
 _tagger = tagger()
-
 # accuracy:  0.940168934772Most Informative Features
 #                   classe = u'PREP+N'        não : sim    =    151.7 : 1.0
 #                     pre1 = u'VAUX'          não : sim    =     94.7 : 1.0
@@ -61,8 +60,9 @@ def features(sentenca,word):
 class Command(BaseCommand): 
     
     def handle(self, *args, **options):
-
+        import pdb; pdb.set_trace();
         materias = Materia.objects.filter(corpo__icontains='automatic-premium-tip-semantico')[:15000]
+        # import pdb; pdb.set_trace();
         featuresets = []
         for m in materias:
 

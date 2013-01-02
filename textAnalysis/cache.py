@@ -16,5 +16,6 @@ class CachedDict(dict):
         return self[key].value
         
     def set(self, key, value):
-        if settings.CACHE:
-            self[key] = CachedItem(key, value)
+        # if settings.CACHE:
+            # self[key] = CachedItem(key, value)
+        pass

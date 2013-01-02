@@ -27,6 +27,9 @@ def link_e_valido(permalink):
     return True
                     
 def esta_no_solr(permalink):
+
+    return False
+
     solr_connection = SolrConnection(settings.SOLRSERVER)
     m = Materia.objects.get(permalink=permalink)
     consulta = solr_connection.query('identifier:"%s"'%m.obtem_url_visao_de_busca(search_type='solr'))
@@ -42,12 +45,11 @@ class Command(BaseCommand):
         datainicio = datetime.datetime(day=1,month=1,year=2011)
         # datafim = datetime.datetime(day=30,month=10,year=2011)
         
-        editorias = ['Brasil','São Paulo','Rio de Janeiro','Minas Gerais',
-        'Economia','Política','Mundo','Espírito Santo','Pop & Arte',
+        editorias = ['Brasil','São Paulo','Rio de Janeiro','Minas Gerais','Política','Mundo','Espírito Santo','Pop & Arte',
         'Auto Esporte','Concursos e Emprego','Ciência e Saúde',
         'Mercados','Música','Tecnologia e Games']
         
-        editorias_id = [39,31,119,214,339,216,146,
+        editorias_id = [39,31,119,214,216,146,
                         8,133,101,94,20,42,76,105]
         
         editorias_excluir = [182,360,349,351,138,329,109,219,284,373,229,285,108,271,272,268,266,
@@ -80,6 +82,7 @@ class Command(BaseCommand):
         #     return
             
         for editoria in editorias_id:
+            # import pdb; pdb.set_trace();
             folder = Folder.objects.get(id=editoria)
             
             materias = Materia.objects.filter(corpo__icontains='saibamais', folders=folder, status='P', ultima_publicacao__gt=datainicio).order_by('ultima_publicacao')
@@ -103,16 +106,19 @@ class Command(BaseCommand):
                         documento['relacionadas'] = set([ change_host(h.attrib['href']).lower() for h in html.cssselect('.saibamais ul li a')])            
                         for uri in documento['relacionadas']:
                             if link_e_valido(remove_host(uri)):
-                                try:
-                                    if not esta_no_solr(remove_host(uri)):
-                                        m1 = Materia.objects.get(permalink=remove_host(uri))
-                                        m1.status = 'P'
-                                        m1.save()
-                                        m1.notifica_barramento("publicar")
-                                    valida = True
-                                except:
-                                    valida = False
-                                    pass
+                                # try:
+                                import pdb; pdb.set_trace();
+
+                                if not esta_no_solr(remove_host(uri)):
+                                    m1 = Materia.objects.get(permalink=remove_host(uri))
+                                    m1.status = 'P'
+                                    m1.save()
+                                    
+                                    m1.notifica_barramento("publicar")
+                                valida = True
+                                # except:
+                                    # valida = False
+                                    # pass
                             else:
                                 # import pdb; pdb.set_trace();
                                 # print "fail", remove_host(uri)
