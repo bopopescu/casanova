@@ -18,7 +18,7 @@ DATABASES = {
     'NAME': 'g1',                      # Or path to database file if using sqlite3.
     'USER': 'u_g1',                      # Not used with sqlite3.
     'PASSWORD': 'u_g1',                  # Not used with sqlite3.
-    'HOST': 'publicacao.staging.mysql.globoi.com',                      # Set to empty string for localhost. Not used with sqlite3.
+    'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
     'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
 }
 }
@@ -43,7 +43,8 @@ BROKER = 'stomp://%s:61613/' % SERVER_NAME
 
 #Solr que processa as notificaes
 # SOLRSERVER = 'http://%s:8983/solr' % SERVER_NAME #'http://solr.portal.qa01.globoi.com/solr'
-SOLRSERVER = 'http://solr.portal.globoi.com/solr'
+# SOLRSERVER = 'http://solr.portal.globoi.com/solr'
+SOLRSERVER = 'http://localhost:8983/solr'
 
 # URL da fast usada para gera dos feeds de noticia/foto/video usados na
 # edi de homegit
@@ -164,13 +165,15 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # 'testutils',
     'textAnalysis',
-    'textSimilarity',
+    #'textSimilarity',
     'globocore',
     # 'globocore.estrutura',
     # 'globocore.materia',
     # Uncomment the next line to enable the admin:
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'importador',
+
 )
 
 EXCLUDE_TEST_APPS = (

@@ -49,7 +49,8 @@ def querySolr(words, editorias, total=50):
         if consulta.results:
             # materias += [(materia, materia['score'] ) for materia in consulta.results]
             materias += consulta.results
-    except:
+    except Exception, e:
+        print str(e)
         print "deu pau na query", query
         pass
     solr_connection.close()
